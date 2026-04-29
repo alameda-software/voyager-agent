@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "VoyagerAgent",
+    "slug": "voyager-agent",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "voyager",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.alamedasoftware.voyageragent"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1a1a2e"
+      },
+      "package": "com.alamedasoftware.voyageragent"
+    },
+    "plugins": ["expo-router"]
+  }
+}
