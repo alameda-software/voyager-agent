@@ -1,14 +1,14 @@
 """
 LangChain tools for the Travel Agent.
 
-Each tool wraps a travel data source (LetsFG, swoop, etc.)
+Each tool wraps a travel data source (LetsFG, etc.)
 and exposes it to the agent for tool-calling.
 """
 
+import json
 from langchain_core.tools import BaseTool
 
 from app.services.letsfg import LetsFGService
-from app.services.swoop import SwoopService
 
 
 class SearchFlightsTool(BaseTool):
@@ -23,6 +23,7 @@ class SearchFlightsTool(BaseTool):
         "adults (number), cabin (economy|premium-economy|business|first), "
         "max_stops (0|1|2, optional)."
     )
+    letsfg: LetsFGService = LetsFGService()
 
     def _run(
         self,
@@ -35,8 +36,7 @@ class SearchFlightsTool(BaseTool):
         max_stops: int | None = None,
     ) -> str:
         import asyncio
-        service = LetsFGService()
-        result = asyncio.run(service.search(
+        result = asyncio.run(self.letsfg.search(
             origin=origin,
             destination=destination,
             date=date,
@@ -45,7 +45,7 @@ class SearchFlightsTool(BaseTool):
             cabin=cabin,
             max_stops=max_stops,
         ))
-        return str(result)
+        return json.dumps(result, default=str)
 
 
 class ResolveLocationTool(BaseTool):
@@ -56,12 +56,12 @@ class ResolveLocationTool(BaseTool):
         "Find the IATA airport code for a city or airport name. "
         "Input should be a string like 'Seville', 'London', 'Barcelona'."
     )
+    letsfg: LetsFGService = LetsFGService()
 
     def _run(self, query: str) -> str:
         import asyncio
-        service = LetsFGService()
-        result = asyncio.run(service.locations(query))
-        return str(result)
+        result = asyncio.run(self.letsfg.locations(query))
+        return json.dumps(result, default=str)
 
 
 # Export available tools
