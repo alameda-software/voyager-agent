@@ -22,11 +22,12 @@ A mobile-first app with a chat-centric interface (Telegram-like) where an AI age
 - Results as rich interactive cards within chat
 - Ability to book/hold selected options
 
-### API Integrations (TBD — research phase)
-- **Flights**: Amadeus, Duffel, Skyscanner, or Kiwi
-- **Hotels**: Amadeus, Booking.com, Hotelbeds
-- **Car Rentals**: Amadeus, Rentalcars.com
-- **Tours/Activities**: Viator, GetYourGuide, Peek
+### Travel Data Sources
+- **Flights**: LetsFG (Python SDK, 400+ airlines, no API key, free)
+- **Hotels**: swoop (Google Hotels scraper, no API key)
+- **Tours/Activities**: Phase 2 (scraping or affiliate)
+
+Note: Traditional APIs (Amadeus, Kiwi, Duffel) require commercial agreements or are shutting down developer access.
 
 ## Features (Phase 2 — stretch)
 - Multi-agent: specialized agents for flights, hotels, activities
@@ -48,7 +49,7 @@ A mobile-first app with a chat-centric interface (Telegram-like) where an AI age
 ## Technical Decisions (Decided)
 3. **Agent framework**: LangChain (tool-calling for API integrations)
 4. **Database**: PostgreSQL (users, bookings, conversations) + Redis (search caching)
-5. **API strategy**: Start with Amadeus (free sandbox, covers flights + hotels + cars)
+5. **API strategy**: LetsFG for flights + swoop for hotels (no signup, no MAU, works immediately)
 6. **Auth**: Email/phone + optional social login (Google/Apple)
 
 ## Open Questions
