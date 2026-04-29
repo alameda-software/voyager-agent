@@ -35,16 +35,23 @@ A mobile-first app with a chat-centric interface (Telegram-like) where an AI age
 - Calendar integration
 - Booking management dashboard
 
-## Technical Decisions Needed
-1. **Mobile framework**: React Native / Flutter / Native (iOS + Android)
-2. **Backend**: Node.js / Python / Go
-3. **Agent framework**: Custom LLM orchestration vs existing (LangChain, CrewAI, etc.)
-4. **Database**: PostgreSQL + Redis (cache) / MongoDB
-5. **API strategy**: Which travel APIs to prioritize first
-6. **Auth**: Email/phone + optional social login
+## Tech Stack (Decided)
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | Expo (React Native) — iOS + Android |
+| **Backend** | Python + FastAPI |
+| **Testing/Staging** | Dokploy |
+| **Production** | AWS |
+| **Dev machine** | macOS |
+
+## Technical Decisions (Decided)
+3. **Agent framework**: LangChain (tool-calling for API integrations)
+4. **Database**: PostgreSQL (users, bookings, conversations) + Redis (search caching)
+5. **API strategy**: Start with Amadeus (free sandbox, covers flights + hotels + cars)
+6. **Auth**: Email/phone + optional social login (Google/Apple)
 
 ## Open Questions
-- Target platforms: iOS, Android, or both first?
 - Budget for travel API access (many require commercial agreements)
 - Do we handle actual booking/payment, or just search + redirect?
 - White-label vs own brand?
