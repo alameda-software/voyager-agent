@@ -23,9 +23,9 @@ A mobile-first app with a chat-centric interface (Telegram-like) where an AI age
 - Ability to book/hold selected options
 
 ### Travel Data Sources
-- **Flights**: LetsFG (Python SDK, 400+ airlines, no API key, free)
-- **Hotels**: swoop (Google Hotels scraper, no API key)
-- **Tours/Activities**: Phase 2 (scraping or affiliate)
+- **Flights**: LetsFG (Python SDK, 400+ airlines, no API key, free) ✅ MVP
+- **Hotels**: Phase 2 — Google Maps API (user has key)
+- **Restaurants**: Phase 2 — Google Maps API
 
 Note: Traditional APIs (Amadeus, Kiwi, Duffel) require commercial agreements or are shutting down developer access.
 
