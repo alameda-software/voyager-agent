@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, useWindowDimensions } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -104,7 +104,11 @@ function MessageBubble({ message }: { message: Message }) {
 // --- Main Chat Screen ---
 export default function ChatScreen() {
   const { id, title } = useLocalSearchParams<{ id: string; title: string }>();
+  const { width } = useWindowDimensions();
   const [input, setInput] = useState("");
+
+  // Web: constrain width for better UX on desktop
+  const maxWidth = width > 600 ? 600 : '100%';
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "0",
@@ -215,13 +219,15 @@ export default function ChatScreen() {
       </View>
 
       {/* Messages */}
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <MessageBubble message={item} />}
-        contentContainerStyle={styles.messagesList}
-        style={styles.messagesContainer}
-      />
+      <View style={[styles.messagesContainer, { maxWidth }]}>
+        <FlatList
+          data={messages}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <MessageBubble message={item} />}
+          contentContainerStyle={styles.messagesList}
+          style={{ flex: 1 }}
+        />
+      </View>
 
       {/* Input */}
       <View style={styles.inputContainer}>
@@ -258,7 +264,7 @@ const styles = StyleSheet.create({
   backButton: { padding: 4 },
   headerTitle: { fontSize: 18, fontWeight: "700", color: "#fff" },
 
-  messagesContainer: { flex: 1 },
+  messagesContainer: { flex: 1, alignSelf: 'stretch' },
   messagesList: { padding: 16, paddingBottom: 8 },
   messageContainer: { marginBottom: 8 },
 

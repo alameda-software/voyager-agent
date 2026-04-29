@@ -34,11 +34,19 @@ make migrate
 # API docs → http://localhost:8000/docs
 ```
 
-### 2. Mobile App (on your Mac)
+### 2. Web App (easiest to test)
 
 ```bash
 cd apps/mobile
 npm install
+npx expo start --web
+```
+
+Opens in browser at `http://localhost:8081` — works on desktop and mobile browsers.
+
+### 3. Mobile App (iOS/Android)
+
+```bash
 npx expo start
 ```
 

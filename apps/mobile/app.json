@@ -17,6 +17,12 @@
       },
       "package": "com.alamedasoftware.voyageragent"
     },
+    "web": {
+      "output": "static",
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png",
+      "name": "VoyagerAgent"
+    },
     "plugins": ["expo-router"]
   }
 }
