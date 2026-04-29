@@ -21,7 +21,8 @@
       "output": "static",
       "bundler": "metro",
       "favicon": "./assets/favicon.png",
-      "name": "VoyagerAgent"
+      "name": "VoyagerAgent",
+      "staticPrerendering": false
     },
     "plugins": ["expo-router"]
   }
