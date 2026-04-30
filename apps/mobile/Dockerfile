@@ -2,6 +2,8 @@ FROM nginx:alpine
 
 COPY web-app.html /usr/share/nginx/html/index.html
 
+RUN echo "voyager-v2-static" > /usr/share/nginx/html/version.txt
+
 RUN echo 'server { \
     listen 80; \
     root /usr/share/nginx/html; \
