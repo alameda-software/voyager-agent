@@ -1,25 +1,6 @@
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-# Set production mode to avoid dev-only issues
-ENV NODE_ENV=production
-ENV CI=1
-
-# Install dependencies
-COPY package.json package-lock.json* ./
-RUN npm install --legacy-peer-deps
-
-# Copy source
-COPY . .
-
-# Build web
-RUN npx expo export -p web
-
-# Serve with Nginx
 FROM nginx:alpine
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY web-app.html /usr/share/nginx/html/index.html
 
 RUN echo 'server { \
     listen 80; \
