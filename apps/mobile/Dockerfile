@@ -2,9 +2,13 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Set production mode to avoid dev-only issues
+ENV NODE_ENV=production
+ENV CI=1
+
 # Install dependencies
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copy source
 COPY . .
@@ -17,7 +21,6 @@ FROM nginx:alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Nginx config for SPA routing
 RUN echo 'server { \
     listen 80; \
     root /usr/share/nginx/html; \

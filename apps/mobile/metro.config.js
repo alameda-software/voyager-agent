@@ -1,9 +1,9 @@
-// Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
-// Support web
+// Fix web module resolution
 config.resolver.unstable_enablePackageExports = false;
+config.resolver.platforms = ['ios', 'android', 'native', 'web'];
 
 module.exports = config;
