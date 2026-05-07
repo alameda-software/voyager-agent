@@ -5,7 +5,8 @@ WORKDIR /app
 RUN pip install --no-cache-dir uv
 
 # Install travel search tools
-RUN pip install --no-cache-dir letsfg swoop
+# Note: swoop is currently broken on PyPI, skipping for now
+RUN pip install --no-cache-dir letsfg
 
 COPY pyproject.toml ./
 RUN uv pip install --system -e ".[dev]"

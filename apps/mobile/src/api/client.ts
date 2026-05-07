@@ -1,5 +1,12 @@
 import axios from "axios";
 
+import type {
+  ConciergeDomain,
+  ConversationDetailResponse,
+  CreateConversationRequest,
+  SendMessageResponse,
+} from "../types";
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
 
 export const api = axios.create({
@@ -17,8 +24,17 @@ export const register = (email: string, password: string, displayName: string) =
   api.post("/api/v1/auth/register", { email, password, display_name: displayName });
 
 // Chat
+export const createConversation = (payload: CreateConversationRequest) =>
+  api.post<ConversationDetailResponse>("/api/v1/chat/conversations", payload);
+
+export const listConversations = (userId: number, domain?: ConciergeDomain) =>
+  api.get("/api/v1/chat/conversations", { params: { user_id: userId, domain } });
+
+export const getConversation = (conversationId: number) =>
+  api.get<ConversationDetailResponse>(`/api/v1/chat/conversations/${conversationId}`);
+
 export const sendMessage = (conversationId: number, content: string) =>
-  api.post("/api/v1/chat/send", { conversation_id: conversationId, content });
+  api.post<SendMessageResponse>("/api/v1/chat/send", { conversation_id: conversationId, content });
 
 export const getHistory = (conversationId: number) =>
   api.get(`/api/v1/chat/history?conversation_id=${conversationId}`);
