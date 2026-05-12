@@ -1,5 +1,7 @@
 FROM nginx:alpine
 
+ARG CACHEBUST=1
+
 COPY web-app.html /usr/share/nginx/html/index.html
 
 RUN echo "voyager-v2-static" > /usr/share/nginx/html/version.txt
