@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "scheme": "voyager",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.alamedasoftware.voyageragent"

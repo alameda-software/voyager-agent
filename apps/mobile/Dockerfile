@@ -1,10 +1,24 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV CI=1
+ENV EXPO_NO_TELEMETRY=1
+
+COPY package.json ./
+RUN npm install --legacy-peer-deps
+
+COPY . .
+
+ARG EXPO_PUBLIC_API_URL=http://213.32.18.160:8000
+ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
+
+RUN npx expo export -p web
+
 FROM nginx:alpine
 
-ARG CACHEBUST=1
-
-COPY web-app.html /usr/share/nginx/html/index.html
-
-RUN echo "voyager-v2-static" > /usr/share/nginx/html/version.txt
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 RUN echo 'server { \
     listen 80; \
