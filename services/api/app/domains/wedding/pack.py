@@ -27,26 +27,44 @@ class WeddingPack:
     def merge_state(self, state: dict, user_message: str) -> dict:
         notes = list(state.get("notes", []))
         notes.append(user_message.strip())
-        next_state = {**state, "notes": notes[-12:]}
+        next_state = {**state, "notes": notes[-20:]}
         next_state["event_request"] = user_message.strip()
         return next_state
 
     def agent_reply(self, state: dict) -> DomainReply:
-        questions = state.get("next_questions", [])
-        prompt = questions[0] if questions else "Tell me the biggest wedding-planning priority."
+        from app.config import settings
+        from openai import OpenAI
+
+        notes = state.get("notes", [])
+        system_prompt = (
+            "You are a warm, experienced wedding planning concierge. "
+            "Help the user plan their perfect wedding. "
+            "Ask one focused follow-up question at a time to gather: location, date, guest count, "
+            "budget, and priority vendors (venue, catering, music, photography, flowers). "
+            "Once you have enough info, suggest vendor options and planning milestones. "
+            "Be warm, celebratory, and practical. Never repeat yourself."
+        )
+
+        messages = [{"role": "system", "content": system_prompt}]
+        for i, note in enumerate(notes):
+            role = "user" if i % 2 == 0 else "assistant"
+            messages.append({"role": role, "content": note})
+
+        try:
+            client = OpenAI(api_key=settings.openai_api_key)
+            response = client.chat.completions.create(
+                model=settings.llm_model,
+                messages=messages,
+                max_tokens=300,
+                temperature=0.7,
+            )
+            reply = response.choices[0].message.content.strip()
+        except Exception as e:
+            reply = f"I'm having trouble connecting right now. Please try again. ({e})"
+
         return DomainReply(
-            content=(
-                "I’ve saved your wedding request and opened a Wedding planning session. "
-                f"Next, I need one key detail: {prompt}"
-            ),
-            payload={
-                "mode": "pre_mvp_fake_data",
-                "domain": self.domain.value,
-                "suggested_actions": [
-                    "collect_wedding_requirements",
-                    "prepare_fake_vendor_search",
-                ],
-            },
+            content=reply,
+            payload={"mode": "llm", "domain": self.domain.value},
         )
 
 
