@@ -1,222 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<meta name="theme-color" content="#0b1220"/>
-<title>VoyagerAgent</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0b1220;color:#fff;overflow:hidden}
-#app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;position:relative}
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>VoyagerAgent</title>
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      /* These styles make the body full-height */
+      html,
+      body {
+        height: 100%;
+      }
+      /* These styles disable body scrolling if you are using <ScrollView> */
+      body {
+        overflow: hidden;
+      }
+      /* These styles make the root element full-height */
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+  </head>
 
-/* HOME SCREEN */
-#home{flex:1;display:flex;flex-direction:column;padding:60px 24px 32px;overflow-y:auto}
-.eyebrow{color:#7dd3fc;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
-.hero-title{color:#f8fafc;font-size:34px;line-height:40px;font-weight:800;margin-bottom:12px}
-.hero-sub{color:#94a3b8;font-size:16px;line-height:24px;margin-bottom:40px}
-.domain-grid{display:flex;flex-direction:column;gap:16px}
-.domain-card{background:#111827;border-radius:22px;padding:22px;border:1px solid #1f2937;cursor:pointer;transition:border-color .2s,transform .1s}
-.domain-card:active{transform:scale(0.98);border-color:#2563eb}
-.icon-wrap{width:56px;height:56px;border-radius:18px;background:#2563eb;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:26px}
-.card-title{color:#f8fafc;font-size:24px;font-weight:700;margin-bottom:8px}
-.card-sub{color:#94a3b8;font-size:15px;line-height:22px;margin-bottom:18px}
-.card-action{color:#7dd3fc;font-size:15px;font-weight:700}
-
-/* CHAT SCREEN */
-#chat{flex:1;display:none;flex-direction:column}
-#chat.active{display:flex}
-.chat-header{padding:56px 16px 12px;background:#111827;border-bottom:1px solid #1f2937;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.back-btn{background:none;border:none;color:#7dd3fc;font-size:22px;cursor:pointer;padding:4px 8px}
-.chat-title-wrap .chat-name{font-size:17px;font-weight:700;color:#f8fafc}
-.chat-title-wrap .chat-domain{font-size:12px;color:#64748b;margin-top:2px}
-.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
-.msg-row{display:flex}
-.msg-row.user{justify-content:flex-end}
-.msg-row.agent{justify-content:flex-start}
-.bubble{max-width:85%;padding:12px 16px;border-radius:16px;font-size:15px;line-height:1.4}
-.bubble.user{background:#2563eb;color:#fff;border-bottom-right-radius:4px}
-.bubble.agent{background:#1e293b;color:#e2e8f0;border-bottom-left-radius:4px}
-.flight-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;margin:8px 0}
-.fc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.fc-airline{font-size:15px;font-weight:600;color:#f8fafc}
-.fc-price{background:#2563eb20;padding:4px 10px;border-radius:8px;color:#60a5fa;font-size:14px;font-weight:700}
-.fc-route{display:flex;align-items:center;margin-bottom:10px}
-.fc-point{flex:1;text-align:center}
-.fc-time{font-size:18px;font-weight:700;color:#f8fafc}
-.fc-airport{font-size:12px;color:#64748b;margin-top:2px}
-.fc-line{flex:1;display:flex;align-items:center;gap:4px;padding:0 8px;color:#475569;font-size:12px}
-.fc-line .line{flex:1;height:1px;background:#334155}
-.fc-footer{display:flex;justify-content:space-around;padding:8px 0;border-top:1px solid #334155;font-size:12px;color:#64748b}
-.book-btn{background:#2563eb;border:none;color:#fff;font-size:14px;font-weight:600;padding:10px;border-radius:8px;width:100%;margin-top:10px;cursor:pointer}
-
-/* WEDDING CARD */
-.vendor-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;margin:8px 0}
-.vendor-name{font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:4px}
-.vendor-type{font-size:12px;color:#a78bfa;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.vendor-detail{font-size:13px;color:#94a3b8;line-height:1.6}
-.vendor-price{margin-top:8px;font-size:15px;font-weight:700;color:#f8fafc}
-.vendor-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid #334155}
-.availability{font-size:12px;color:#4ade80}
-
-.input-bar{display:flex;align-items:center;padding:8px 12px 24px;background:#111827;border-top:1px solid #1f2937;flex-shrink:0}
-.input-bar input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:20px;padding:10px 16px;color:#f8fafc;font-size:15px;outline:none}
-.input-bar input::placeholder{color:#475569}
-.send-btn{width:40px;height:40px;border-radius:20px;background:#2563eb;border:none;cursor:pointer;color:#fff;font-size:18px;margin-left:8px;display:flex;align-items:center;justify-content:center}
-
-.typing span{display:inline-block;width:7px;height:7px;background:#475569;border-radius:50%;margin:0 2px;animation:bounce 1.2s infinite}
-.typing span:nth-child(2){animation-delay:.2s}
-.typing span:nth-child(3){animation-delay:.4s}
-@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
-.fade-in{animation:fadeIn .2s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-</style>
-</head>
-<body>
-<div id="app">
-  <!-- HOME -->
-  <div id="home">
-    <p class="eyebrow">Pre-MVP Concierge Engine</p>
-    <h1 class="hero-title">Choose the concierge mode you want to test.</h1>
-    <p class="hero-sub">Both flows share the same backend session engine, but load different domain logic.</p>
-    <div class="domain-grid">
-      <div class="domain-card" onclick="openDomain('voyager')">
-        <div class="icon-wrap">✈️</div>
-        <div class="card-title">Voyager</div>
-        <div class="card-sub">Plan trips, compare routes, and build itineraries.</div>
-        <div class="card-action">Open Voyager →</div>
-      </div>
-      <div class="domain-card" onclick="openDomain('wedding')">
-        <div class="icon-wrap">💍</div>
-        <div class="card-title">Wedding</div>
-        <div class="card-sub">Shortlist venues, vendors, and planning priorities.</div>
-        <div class="card-action">Open Wedding →</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CHAT -->
-  <div id="chat">
-    <div class="chat-header">
-      <button class="back-btn" onclick="goHome()">←</button>
-      <div class="chat-title-wrap">
-        <div class="chat-name" id="chatName">Voyager</div>
-        <div class="chat-domain" id="chatDomain">Travel concierge</div>
-      </div>
-    </div>
-    <div class="messages" id="messages"></div>
-    <div class="input-bar">
-      <input type="text" id="msgInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')sendMsg()"/>
-      <button class="send-btn" onclick="sendMsg()">➤</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const API_URL = 'http://213.32.18.160:8000';
-let domain = null;
-const history = { voyager: [], wedding: [] };
-
-const INTROS = {
-  voyager: [
-    {role:'agent',type:'text',content:'Hey! I\'m your Voyager travel concierge. 🌍\n\nTell me where you want to go — I\'ll handle flights, hotels, and itinerary.'},
-  ],
-  wedding: [
-    {role:'agent',type:'text',content:'Hi! I\'m your Wedding concierge. 💍\n\nTell me about your dream wedding — date, style, guest count — and I\'ll help you shortlist venues and vendors.'},
-  ]
-};
-
-const DEMO = {
-  voyager: {
-    trigger: ['svq','lhr','london','seville','flight','madrid','barcelona','paris'],
-    reply: {role:'agent',type:'flights',content:'Here are some great options I found:',data:[
-      {airline:'Ryanair',dep:'SVQ',arr:'STN',depTime:'06:30',arrTime:'08:45',duration:'2h 15m',stops:0,price:'49€'},
-      {airline:'Vueling',dep:'SVQ',arr:'LGW',depTime:'10:15',arrTime:'12:30',duration:'2h 15m',stops:0,price:'78€'},
-      {airline:'Iberia',dep:'SVQ',arr:'LHR',depTime:'14:20',arrTime:'17:50',duration:'3h 30m',stops:1,price:'142€'},
-    ]}
-  },
-  wedding: {
-    trigger: ['venue','seville','sevilla','wedding','cater','band','photog','florist'],
-    reply: {role:'agent',type:'vendors',content:'Here are some top options in Seville:',data:[
-      {name:'Hacienda Benazuza',type:'Venue',detail:'Historic 10th-century hacienda, capacity 250 guests, outdoor ceremony available',price:'From €8,500',available:true},
-      {name:'El Palacio de los Marqueses',type:'Venue',detail:'Baroque palace in historic centre, capacity 180 guests, stunning courtyard',price:'From €6,200',available:true},
-      {name:'Grupo Abades Catering',type:'Catering',detail:'Premium Andalusian cuisine, full service, min 80 guests',price:'From €85/person',available:true},
-    ]}
-  }
-};
-
-function openDomain(d) {
-  domain = d;
-  document.getElementById('home').style.display = 'none';
-  document.getElementById('chat').classList.add('active');
-  document.getElementById('chatName').textContent = d === 'voyager' ? 'Voyager' : 'Wedding';
-  document.getElementById('chatDomain').textContent = d === 'voyager' ? 'Travel concierge' : 'Wedding concierge';
-  if (!history[d].length) history[d] = [...INTROS[d]];
-  renderMessages();
-  document.getElementById('msgInput').placeholder = d === 'voyager' ? 'Where do you want to go?' : 'Tell me about your wedding...';
-}
-
-function goHome() {
-  domain = null;
-  document.getElementById('home').style.display = 'flex';
-  document.getElementById('chat').classList.remove('active');
-}
-
-function flightCard(f) {
-  return `<div class="flight-card"><div class="fc-header"><span class="fc-airline">${f.airline}</span><span class="fc-price">${f.price}</span></div><div class="fc-route"><div class="fc-point"><div class="fc-time">${f.depTime}</div><div class="fc-airport">${f.dep}</div></div><div class="fc-line"><div class="line"></div>✈️<div class="line"></div></div><div class="fc-point"><div class="fc-time">${f.arrTime}</div><div class="fc-airport">${f.arr}</div></div></div><div class="fc-footer"><span>${f.duration}</span><span>${f.stops===0?'Direct':f.stops+' stop'}</span></div><button class="book-btn">Book this flight</button></div>`;
-}
-
-function vendorCard(v) {
-  return `<div class="vendor-card"><div class="vendor-type">${v.type}</div><div class="vendor-name">${v.name}</div><div class="vendor-detail">${v.detail}</div><div class="vendor-footer"><span class="vendor-price">${v.price}</span><span class="availability">${v.available?'✓ Available':''}</span></div><button class="book-btn">Request info</button></div>`;
-}
-
-function renderMessages() {
-  const el = document.getElementById('messages');
-  el.innerHTML = history[domain].map(m => {
-    if (m.type === 'flights' && m.data) return `<div class="msg-row agent fade-in"><div class="bubble agent">${m.content}${m.data.map(flightCard).join('')}</div></div>`;
-    if (m.type === 'vendors' && m.data) return `<div class="msg-row agent fade-in"><div class="bubble agent">${m.content}${m.data.map(vendorCard).join('')}</div></div>`;
-    if (m.isTyping) return `<div class="msg-row agent"><div class="bubble agent"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
-    return `<div class="msg-row ${m.role} fade-in"><div class="bubble ${m.role}">${m.content}</div></div>`;
-  }).join('');
-  el.scrollTop = el.scrollHeight;
-}
-
-async function sendMsg() {
-  const input = document.getElementById('msgInput');
-  const text = input.value.trim();
-  if (!text || !domain) return;
-  history[domain].push({role:'user',type:'text',content:text});
-  input.value = '';
-  history[domain].push({role:'agent',isTyping:true});
-  renderMessages();
-
-  // Check for demo triggers
-  const lower = text.toLowerCase();
-  const demo = DEMO[domain];
-  const isDemo = demo.trigger.some(t => lower.includes(t));
-
-  await new Promise(r => setTimeout(r, 1200));
-  history[domain] = history[domain].filter(m => !m.isTyping);
-
-  try {
-    const resp = await fetch(API_URL + '/api/v1/chat/send', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({message:text, conversation_id:1, domain})
-    });
-    const data = await resp.json();
-    history[domain].push({role:'agent', type:'text', content: data.content || data.message || JSON.stringify(data)});
-  } catch(e) {
-    if (isDemo) {
-      history[domain].push(demo.reply);
-    } else {
-      const responses = domain === 'voyager'
-        ? ["Got it! Tell me your travel dates and I'll search for the best options. 📅", "Sounds like a great trip! What's your budget range?", "Perfect. Do you prefer direct flights or are you open to stopovers?"]
-        : ["Lovely! What's your target date and how many guests are you expecting? 💐", "Great choice! Seville has some stunning venues. What's your approximate budget?", "Wonderful! Do you have a preference for indoor or outdoor ceremony?"];
-      history[domain].push({role:'agent', type:'text', content: responses[Math.floor(Math.random()*responses.length)]});
-    }
-  }
-  renderMessages();
-}
-</script>
+  <body>
+    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
+  <script src="/_expo/static/js/web/entry-bbb8c5cf4d9156916c4e7929fe2dfde0.js" defer></script>
 </body>
 </html>
