@@ -30,15 +30,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
     <View style={[styles.messageContainer, { alignItems: isUser ? "flex-end" : "flex-start" }]}>
       <View style={[styles.bubble, isUser ? styles.userBubble : styles.agentBubble]}>
         <Text style={isUser ? styles.userText : styles.agentText}>{message.content}</Text>
-        {!isUser && actionHints.length > 0 ? (
-          <View style={styles.hintRow}>
-            {actionHints.map((action) => (
-              <View key={action} style={styles.hintChip}>
-                <Text style={styles.hintText}>{action}</Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
+
       </View>
     </View>
   );
@@ -82,21 +74,8 @@ export default function ChatScreen() {
       const response = await sendMessage(Number(id), input.trim());
       setInput("");
       setState(response.data.structured_state);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: String(response.data.user_message.id),
-          role: response.data.user_message.role,
-          content: response.data.user_message.content,
-          payload: response.data.user_message.payload,
-        },
-        {
-          id: String(response.data.agent_message.id),
-          role: response.data.agent_message.role,
-          content: response.data.agent_message.content,
-          payload: response.data.agent_message.payload,
-        },
-      ]);
+      // Reload from server to get canonical state (avoids duplicates)
+      await loadConversation(Number(id));
     } finally {
       setIsSending(false);
     }
@@ -201,14 +180,7 @@ const styles = StyleSheet.create({
   agentBubble: { backgroundColor: "#111827", borderBottomLeftRadius: 4, borderWidth: 1, borderColor: "#1f2937" },
   userText: { color: "#eff6ff", fontSize: 15, lineHeight: 22 },
   agentText: { color: "#e5e7eb", fontSize: 15, lineHeight: 22 },
-  hintRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 },
-  hintChip: {
-    borderRadius: 999,
-    backgroundColor: "#172554",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  hintText: { color: "#bfdbfe", fontSize: 11, fontWeight: "700" },
+
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
