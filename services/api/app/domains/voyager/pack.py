@@ -60,8 +60,10 @@ Gather: origin, destination, dates, number of travellers, budget, and whether th
 - Once you have origin + destination + dates + travellers → call search_flights
 - Once you know destination + dates → offer to call search_hotels
 - If user mentions needing a car → call search_car_rentals
-After showing results, help with activities, tips, and itinerary.
-Be concise and warm. Never repeat yourself. Keep replies under 3 sentences unless showing options."""
+IMPORTANT: When you call a search function, the results will be shown as visual cards to the user.
+DO NOT list the results as numbered text — just write a short 1-2 sentence intro and ask what they need next.
+Example good response after flights: "Here are the best options for your trip! Would you also like hotels or a rental car?"
+Be concise and warm. Never repeat yourself."""
 
 
 class VoyagerPack:

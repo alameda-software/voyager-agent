@@ -105,16 +105,31 @@ function CarCard({ card }: { card: any }) {
   );
 }
 
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/^\d+\.\s.*/gm, '') // remove numbered list lines when cards are shown
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
   const cards = message.payload?.cards ?? [];
   const mode = message.payload?.mode;
+  const hasCards = cards.length > 0;
+
+  // When cards are present, strip the numbered list from the text (cards replace it)
+  const displayText = hasCards ? stripMarkdown(message.content) : message.content;
 
   return (
     <View style={[styles.messageContainer, { alignItems: isUser ? "flex-end" : "flex-start" }]}>
-      <View style={[styles.bubble, isUser ? styles.userBubble : styles.agentBubble]}>
-        <Text style={isUser ? styles.userText : styles.agentText}>{message.content}</Text>
-      </View>
+      {displayText.length > 0 && (
+        <View style={[styles.bubble, isUser ? styles.userBubble : styles.agentBubble]}>
+          <Text style={isUser ? styles.userText : styles.agentText}>{displayText}</Text>
+        </View>
+      )}
       {cards.length > 0 && (
         <View style={styles.cardsContainer}>
           {cards.map((card: any, i: number) => {
@@ -301,7 +316,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cardsContainer: { marginTop: 8, gap: 8, width: '100%' },
+  cardsContainer: { marginTop: 8, gap: 10, width: '100%', paddingHorizontal: 0 },
   card: {
     backgroundColor: "#ffffff",
     borderRadius: 14,
