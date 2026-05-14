@@ -1,3 +1,4 @@
+import subprocess
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -8,10 +9,19 @@ from app.api.v1.endpoints import chat, auth, search
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: init DB pool, Redis, etc.
+    # Run DB migrations on startup
+    try:
+        result = subprocess.run(
+            ["alembic", "upgrade", "head"],
+            capture_output=True, text=True, timeout=60
+        )
+        if result.returncode != 0:
+            print("Migration warning:", result.stderr)
+        else:
+            print("Migrations OK:", result.stdout)
+    except Exception as e:
+        print("Migration error:", e)
     yield
-    # Shutdown: close connections
-    pass
 
 
 app = FastAPI(
