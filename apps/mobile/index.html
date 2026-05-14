@@ -7,13 +7,24 @@
   <title>VoyagerAgent</title>
   <style>
     * { box-sizing: border-box; }
-    html, body, #root {
+    html {
+      height: 100%;
+      width: 100%;
+      background: #0b1220;
+    }
+    body {
       height: 100%;
       width: 100%;
       margin: 0;
       padding: 0;
       background: #0b1220;
       overflow: hidden;
+      overscroll-behavior: none;
+    }
+    #root {
+      height: 100%;
+      width: 100%;
+      background: #0b1220;
     }
     #root {
       display: flex;

@@ -98,8 +98,8 @@ const styles = StyleSheet.create({
     minHeight: '100%',
     backgroundColor: "#0b1220",
     paddingHorizontal: 24,
-    paddingTop: 80,
-    paddingBottom: 32,
+    paddingTop: 56,
+    paddingBottom: 60,
   },
   hero: {
     marginBottom: 32,
