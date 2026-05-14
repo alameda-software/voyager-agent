@@ -29,6 +29,7 @@ app = FastAPI(
     title="VoyagerAgent API",
     version="0.1.0",
     lifespan=lifespan,
+    debug=True,
 )
 
 # Explicit OPTIONS handler to bypass Traefik CORS stripping
