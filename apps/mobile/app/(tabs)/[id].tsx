@@ -162,8 +162,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e293b",
   },
   domainBadgeText: { color: "#cbd5e1", fontSize: 12, fontWeight: "700", textTransform: "capitalize" },
-  messagesContainer: { flex: 1 },
-  messagesList: { padding: 16, paddingBottom: 8 },
+  messagesContainer: { flex: 1, backgroundColor: "#07111f" },
+  messagesList: { padding: 16, paddingBottom: 8, backgroundColor: "#07111f" },
   stateCard: {
     backgroundColor: "#0f172a",
     borderRadius: 18,
