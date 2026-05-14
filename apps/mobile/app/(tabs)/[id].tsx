@@ -93,7 +93,7 @@ export default function ChatScreen() {
     >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace("/")} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color="#0f172a" />
         </TouchableOpacity>
         <View style={styles.headerCopy}>
           <Text style={styles.headerTitle}>{title || plannerLabel}</Text>
@@ -132,7 +132,7 @@ export default function ChatScreen() {
           editable={!isSending}
         />
         <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={isSending}>
-          <Ionicons name="send" size={18} color="#0b1220" />
+          <Ionicons name="send" size={18} color="#ffffff" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -140,60 +140,60 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#07111f" },
+  container: { flex: 1, backgroundColor: "#ffffff" },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
     paddingTop: Platform.OS === "ios" ? 60 : 40,
     paddingBottom: 12,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#ffffff",
     borderBottomWidth: 1,
-    borderBottomColor: "#1e293b",
+    borderBottomColor: "#e2e8f0",
   },
   backButton: { padding: 4, marginRight: 8 },
   headerCopy: { flex: 1 },
-  headerTitle: { fontSize: 18, fontWeight: "700", color: "#f8fafc" },
-  headerSub: { fontSize: 12, color: "#7dd3fc", marginTop: 2, textTransform: "capitalize" },
+  headerTitle: { fontSize: 18, fontWeight: "700", color: "#0f172a" },
+  headerSub: { fontSize: 12, color: "#2563eb", marginTop: 2, textTransform: "capitalize" },
   domainBadge: {
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: "#1e293b",
+    backgroundColor: "#eff6ff",
   },
-  domainBadgeText: { color: "#cbd5e1", fontSize: 12, fontWeight: "700", textTransform: "capitalize" },
-  messagesContainer: { flex: 1, backgroundColor: "#07111f" },
-  messagesList: { padding: 16, paddingBottom: 8, backgroundColor: "#07111f" },
+  domainBadgeText: { color: "#2563eb", fontSize: 12, fontWeight: "700", textTransform: "capitalize" },
+  messagesContainer: { flex: 1, backgroundColor: "#f8fafc" },
+  messagesList: { padding: 16, paddingBottom: 8, backgroundColor: "#f8fafc" },
   stateCard: {
-    backgroundColor: "#0f172a",
+    backgroundColor: "#f1f5f9",
     borderRadius: 18,
     padding: 14,
     marginBottom: 18,
     borderWidth: 1,
-    borderColor: "#1e293b",
+    borderColor: "#e2e8f0",
   },
-  stateTitle: { color: "#7dd3fc", fontSize: 13, fontWeight: "700", marginBottom: 10, textTransform: "uppercase" },
-  stateBody: { color: "#cbd5e1", fontSize: 12, lineHeight: 18, fontFamily: Platform.select({ ios: "Menlo", default: "monospace" }) },
+  stateTitle: { color: "#2563eb", fontSize: 13, fontWeight: "700", marginBottom: 10, textTransform: "uppercase" },
+  stateBody: { color: "#475569", fontSize: 12, lineHeight: 18, fontFamily: Platform.select({ ios: "Menlo", default: "monospace" }) },
   messageContainer: { marginBottom: 10 },
   bubble: { maxWidth: "88%", padding: 14, borderRadius: 18 },
   userBubble: { backgroundColor: "#2563eb", borderBottomRightRadius: 4 },
-  agentBubble: { backgroundColor: "#111827", borderBottomLeftRadius: 4, borderWidth: 1, borderColor: "#1f2937" },
-  userText: { color: "#eff6ff", fontSize: 15, lineHeight: 22 },
-  agentText: { color: "#e5e7eb", fontSize: 15, lineHeight: 22 },
+  agentBubble: { backgroundColor: "#ffffff", borderBottomLeftRadius: 4, borderWidth: 1, borderColor: "#e2e8f0" },
+  userText: { color: "#ffffff", fontSize: 15, lineHeight: 22 },
+  agentText: { color: "#1e293b", fontSize: 15, lineHeight: 22 },
 
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 14,
     paddingVertical: 12,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#ffffff",
     borderTopWidth: 1,
-    borderTopColor: "#1e293b",
+    borderTopColor: "#e2e8f0",
   },
   input: {
     flex: 1,
-    backgroundColor: "#111827",
-    color: "#f8fafc",
+    backgroundColor: "#f1f5f9",
+    color: "#0f172a",
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: "#7dd3fc",
+    backgroundColor: "#2563eb",
     alignItems: "center",
     justifyContent: "center",
   },
