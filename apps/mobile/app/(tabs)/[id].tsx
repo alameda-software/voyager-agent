@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
 import { getConversation, sendMessage } from "../../src/api/client";
+import { addItemToPlan } from "../../src/store/plan";
 import type { ConciergeDomain, MessagePayload, StructuredState } from "../../src/types";
 
 interface ChatMessage {
@@ -22,7 +23,20 @@ interface ChatMessage {
   payload?: MessagePayload | null;
 }
 
-function FlightCard({ card }: { card: any }) {
+function AddToPlanButton({ onPress, added }: { onPress: () => void; added?: boolean }) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.addPlanBtn, added && styles.addPlanBtnDone]}
+    >
+      <Text style={[styles.addPlanBtnText, added && styles.addPlanBtnTextDone]}>
+        {added ? '✓ En el plan' : '+ Añadir al plan'}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+function FlightCard({ card, onAddToPlan }: { card: any; onAddToPlan?: () => void }) {
   return (
     <View style={styles.flightCard}>
       {/* Header: airline + price */}
@@ -65,8 +79,8 @@ function FlightCard({ card }: { card: any }) {
 
       {/* Footer */}
       <View style={styles.flightFooter}>
-        <Text style={styles.flightSeats}>🔴 {card.seats_left} plazas disponibles</Text>
-        <Text style={styles.flightTotal}>Total {card.total_price !== card.price_per_person ? `€${card.total_price}` : ''}</Text>
+        <Text style={styles.flightSeats}>🔴 {card.seats_left} plazas</Text>
+        {onAddToPlan && <AddToPlanButton onPress={onAddToPlan} />}
       </View>
     </View>
   );
@@ -89,7 +103,7 @@ function VendorCard({ card }: { card: any }) {
   );
 }
 
-function HotelCard({ card }: { card: any }) {
+function HotelCard({ card, onAddToPlan }: { card: any; onAddToPlan?: () => void }) {
   const stars = '⭐'.repeat(card.stars || 3);
   return (
     <View style={styles.card}>
@@ -105,11 +119,12 @@ function HotelCard({ card }: { card: any }) {
       </View>
       <Text style={styles.cardSeats}>{card.description}</Text>
       <Text style={styles.cardSeats}>★ {card.rating} · {card.reviews} opiniones · {card.nights} noches = €{card.total_price}</Text>
+      {onAddToPlan && <AddToPlanButton onPress={onAddToPlan} />}
     </View>
   );
 }
 
-function CarCard({ card }: { card: any }) {
+function CarCard({ card, onAddToPlan }: { card: any; onAddToPlan?: () => void }) {
   return (
     <View style={styles.card}>
       <View style={styles.cardRow}>
@@ -125,6 +140,7 @@ function CarCard({ card }: { card: any }) {
       <Text style={styles.cardSeats}>
         {card.transmission} · {card.seats} plazas · {card.ac ? 'AC' : ''} · {(card.included || []).join(', ')}
       </Text>
+      {onAddToPlan && <AddToPlanButton onPress={onAddToPlan} />}
     </View>
   );
 }
@@ -138,13 +154,23 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
-function MessageBubble({ message }: { message: ChatMessage }) {
+function MessageBubble({ message, conversationId, conversationTitle, domain }: {
+  message: ChatMessage;
+  conversationId: number;
+  conversationTitle: string;
+  domain: string;
+}) {
   const isUser = message.role === "user";
   const cards = message.payload?.cards ?? [];
   const mode = message.payload?.mode;
   const hasCards = cards.length > 0;
+  const [addedItems, setAddedItems] = useState<Set<number>>(new Set());
 
-  // When cards are present, strip the numbered list from the text (cards replace it)
+  const handleAddToPlan = (card: any, index: number, type: 'flight' | 'hotel' | 'car' | 'vendor') => {
+    addItemToPlan(conversationId, conversationTitle, domain as any, { type, data: card });
+    setAddedItems(prev => new Set([...prev, index]));
+  };
+
   const displayText = hasCards ? stripMarkdown(message.content) : message.content;
 
   return (
@@ -157,9 +183,10 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       {cards.length > 0 && (
         <View style={styles.cardsContainer}>
           {cards.map((card: any, i: number) => {
-            if (mode === 'flight_results') return <FlightCard key={i} card={card} />;
-            if (mode === 'hotel_results') return <HotelCard key={i} card={card} />;
-            if (mode === 'car_results') return <CarCard key={i} card={card} />;
+            const added = addedItems.has(i);
+            if (mode === 'flight_results') return <FlightCard key={i} card={card} onAddToPlan={added ? undefined : () => handleAddToPlan(card, i, 'flight')} />;
+            if (mode === 'hotel_results') return <HotelCard key={i} card={card} onAddToPlan={added ? undefined : () => handleAddToPlan(card, i, 'hotel')} />;
+            if (mode === 'car_results') return <CarCard key={i} card={card} onAddToPlan={added ? undefined : () => handleAddToPlan(card, i, 'car')} />;
             return <VendorCard key={i} card={card} />;
           })}
         </View>
@@ -239,17 +266,16 @@ export default function ChatScreen() {
       <FlatList
         data={messages}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <MessageBubble message={item} />}
+        renderItem={({ item }) => (
+          <MessageBubble
+            message={item}
+            conversationId={Number(id)}
+            conversationTitle={title || plannerLabel}
+            domain={activeDomain}
+          />
+        )}
         contentContainerStyle={styles.messagesList}
         style={styles.messagesContainer}
-        ListHeaderComponent={
-          state ? (
-            <View style={styles.stateCard}>
-              <Text style={styles.stateTitle}>Structured state</Text>
-              <Text style={styles.stateBody}>{JSON.stringify(state.payload, null, 2)}</Text>
-            </View>
-          ) : null
-        }
       />
 
       <View style={styles.inputContainer}>
@@ -407,4 +433,12 @@ const styles = StyleSheet.create({
     paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f1f5f9' },
   flightSeats: { fontSize: 11, color: '#ef4444' },
   flightTotal: { fontSize: 12, fontWeight: '600', color: '#64748b' },
+  addPlanBtn: {
+    marginTop: 10, paddingVertical: 8, borderRadius: 10,
+    backgroundColor: '#eff6ff', borderWidth: 1, borderColor: '#bfdbfe',
+    alignItems: 'center',
+  },
+  addPlanBtnDone: { backgroundColor: '#f0fdf4', borderColor: '#86efac' },
+  addPlanBtnText: { fontSize: 13, fontWeight: '700', color: '#2563eb' },
+  addPlanBtnTextDone: { color: '#16a34a' },
 });
