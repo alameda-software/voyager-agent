@@ -24,26 +24,50 @@ interface ChatMessage {
 
 function FlightCard({ card }: { card: any }) {
   return (
-    <View style={styles.card}>
-      <View style={styles.cardRow}>
-        <Text style={styles.cardAirline}>{card.airline}</Text>
-        <Text style={styles.cardPrice}>€{card.price_per_person}<Text style={styles.cardPriceSub}>/pax</Text></Text>
-      </View>
-      <View style={styles.cardRow}>
-        <View style={styles.cardFlight}>
-          <Text style={styles.cardTime}>{card.departure}</Text>
-          <Text style={styles.cardIata}>{card.origin}</Text>
+    <View style={styles.flightCard}>
+      {/* Header: airline + price */}
+      <View style={styles.flightHeader}>
+        <View style={styles.flightAirlineRow}>
+          <View style={styles.flightAirlineDot} />
+          <Text style={styles.flightAirlineName}>{card.airline}</Text>
+          <View style={[styles.flightBadge, card.stops === 0 && styles.flightBadgeDirect]}>
+            <Text style={styles.flightBadgeText}>{card.stops_label}</Text>
+          </View>
         </View>
-        <View style={styles.cardMiddle}>
-          <Text style={styles.cardDuration}>{card.duration}</Text>
-          <Text style={styles.cardStops}>{card.stops_label}</Text>
-        </View>
-        <View style={[styles.cardFlight, { alignItems: 'flex-end' }]}>
-          <Text style={styles.cardTime}>{card.arrival}</Text>
-          <Text style={styles.cardIata}>{card.destination}</Text>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={styles.flightPrice}>€{card.price_per_person}</Text>
+          <Text style={styles.flightPriceSub}>por persona</Text>
         </View>
       </View>
-      <Text style={styles.cardSeats}>{card.seats_left} seats left · {card.cabin}</Text>
+
+      {/* Route row */}
+      <View style={styles.flightRoute}>
+        <View style={styles.flightEndpoint}>
+          <Text style={styles.flightTime}>{card.departure}</Text>
+          <Text style={styles.flightIata}>{card.origin}</Text>
+          <Text style={styles.flightCity}>{card.origin_city}</Text>
+        </View>
+        <View style={styles.flightMiddle}>
+          <Text style={styles.flightDuration}>{card.duration}</Text>
+          <View style={styles.flightLine}>
+            <View style={styles.flightLineDot} />
+            <View style={styles.flightLineBar} />
+            <View style={styles.flightArrow} />
+          </View>
+          <Text style={styles.flightCabin}>{card.cabin}</Text>
+        </View>
+        <View style={[styles.flightEndpoint, { alignItems: 'flex-end' }]}>
+          <Text style={styles.flightTime}>{card.arrival}</Text>
+          <Text style={styles.flightIata}>{card.destination}</Text>
+          <Text style={styles.flightCity}>{card.destination_city}</Text>
+        </View>
+      </View>
+
+      {/* Footer */}
+      <View style={styles.flightFooter}>
+        <Text style={styles.flightSeats}>🔴 {card.seats_left} plazas disponibles</Text>
+        <Text style={styles.flightTotal}>Total {card.total_price !== card.price_per_person ? `€${card.total_price}` : ''}</Text>
+      </View>
     </View>
   );
 }
@@ -316,30 +340,72 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cardsContainer: { marginTop: 8, gap: 10, width: '100%', paddingHorizontal: 0 },
+  cardsContainer: { marginTop: 8, gap: 10, width: '100%' },
+
+  // Generic card (vendors, hotels, cars)
   card: {
     backgroundColor: "#ffffff",
-    borderRadius: 14,
+    borderRadius: 16,
     padding: 14,
     borderWidth: 1,
     borderColor: "#e2e8f0",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
   cardAirline: { fontSize: 15, fontWeight: "700", color: "#0f172a" },
   cardPrice: { fontSize: 18, fontWeight: "800", color: "#2563eb" },
   cardPriceSub: { fontSize: 12, fontWeight: "400", color: "#64748b" },
   cardFlight: { alignItems: "flex-start" },
   cardMiddle: { alignItems: "center", flex: 1 },
-  cardTime: { fontSize: 18, fontWeight: "700", color: "#0f172a" },
+  cardTime: { fontSize: 20, fontWeight: "800", color: "#0f172a" },
   cardIata: { fontSize: 12, color: "#64748b", marginTop: 2 },
   cardDuration: { fontSize: 12, color: "#64748b" },
   cardStops: { fontSize: 11, color: "#2563eb", fontWeight: "600", marginTop: 2 },
   cardSeats: { fontSize: 12, color: "#94a3b8", marginTop: 4 },
   cardStyle: { fontSize: 13, color: "#475569", marginBottom: 4 },
   cardRating: { fontSize: 14, fontWeight: "700", color: "#f59e0b" },
+
+  // Flight card
+  flightCard: {
+    backgroundColor: "#ffffff",
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    shadowColor: "#2563eb",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  flightHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  flightAirlineRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  flightAirlineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#2563eb' },
+  flightAirlineName: { fontSize: 15, fontWeight: '700', color: '#0f172a' },
+  flightBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, backgroundColor: '#f1f5f9' },
+  flightBadgeDirect: { backgroundColor: '#dcfce7' },
+  flightBadgeText: { fontSize: 11, fontWeight: '700', color: '#475569' },
+  flightPrice: { fontSize: 22, fontWeight: '800', color: '#2563eb' },
+  flightPriceSub: { fontSize: 11, color: '#94a3b8', textAlign: 'right' },
+  flightRoute: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  flightEndpoint: { alignItems: 'flex-start', minWidth: 70 },
+  flightTime: { fontSize: 22, fontWeight: '800', color: '#0f172a' },
+  flightIata: { fontSize: 13, fontWeight: '700', color: '#64748b', marginTop: 2 },
+  flightCity: { fontSize: 11, color: '#94a3b8', marginTop: 1 },
+  flightMiddle: { flex: 1, alignItems: 'center', paddingHorizontal: 8 },
+  flightDuration: { fontSize: 11, color: '#64748b', marginBottom: 4 },
+  flightLine: { flexDirection: 'row', alignItems: 'center', width: '100%' },
+  flightLineDot: { width: 6, height: 6, borderRadius: 3, borderWidth: 1.5, borderColor: '#94a3b8' },
+  flightLineBar: { flex: 1, height: 1.5, backgroundColor: '#cbd5e1' },
+  flightArrow: { width: 0, height: 0, borderTopWidth: 5, borderBottomWidth: 5, borderLeftWidth: 8,
+    borderTopColor: 'transparent', borderBottomColor: 'transparent', borderLeftColor: '#94a3b8' },
+  flightCabin: { fontSize: 10, color: '#94a3b8', marginTop: 4 },
+  flightFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f1f5f9' },
+  flightSeats: { fontSize: 11, color: '#ef4444' },
+  flightTotal: { fontSize: 12, fontWeight: '600', color: '#64748b' },
 });
