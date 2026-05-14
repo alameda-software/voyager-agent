@@ -1,4 +1,3 @@
-import subprocess
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -6,22 +5,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.v1.endpoints import chat, auth, search
+from app.db.base import Base
+from app.db.session import engine
+from app import models  # noqa: F401 - ensure all models are registered
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Run DB migrations on startup
+    # Create all DB tables on startup
     try:
-        result = subprocess.run(
-            ["alembic", "upgrade", "head"],
-            capture_output=True, text=True, timeout=60
-        )
-        if result.returncode != 0:
-            print("Migration warning:", result.stderr)
-        else:
-            print("Migrations OK:", result.stdout)
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("DB tables created/verified OK")
     except Exception as e:
-        print("Migration error:", e)
+        print("DB init error:", e)
     yield
 
 
