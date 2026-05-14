@@ -29,8 +29,8 @@ function FlightCard({ card }: { card: any }) {
       <View style={styles.flightHeader}>
         <View style={styles.flightAirlineRow}>
           <View style={styles.flightAirlineDot} />
-          <Text style={styles.flightAirlineName}>{card.airline}</Text>
-          <View style={[styles.flightBadge, card.stops === 0 && styles.flightBadgeDirect]}>
+          <Text style={[styles.flightAirlineName, { marginLeft: 8 }]}>{card.airline}</Text>
+          <View style={[styles.flightBadge, card.stops === 0 && styles.flightBadgeDirect, { marginLeft: 8 }]}>
             <Text style={styles.flightBadgeText}>{card.stops_label}</Text>
           </View>
         </View>
@@ -52,7 +52,7 @@ function FlightCard({ card }: { card: any }) {
           <View style={styles.flightLine}>
             <View style={styles.flightLineDot} />
             <View style={styles.flightLineBar} />
-            <View style={styles.flightArrow} />
+            <Text style={{ fontSize: 14, color: '#94a3b8' }}>›</Text>
           </View>
           <Text style={styles.flightCabin}>{card.cabin}</Text>
         </View>
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   flightHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
-  flightAirlineRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  flightAirlineRow: { flexDirection: 'row', alignItems: 'center' },
   flightAirlineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#2563eb' },
   flightAirlineName: { fontSize: 15, fontWeight: '700', color: '#0f172a' },
   flightBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, backgroundColor: '#f1f5f9' },
@@ -401,8 +401,7 @@ const styles = StyleSheet.create({
   flightLine: { flexDirection: 'row', alignItems: 'center', width: '100%' },
   flightLineDot: { width: 6, height: 6, borderRadius: 3, borderWidth: 1.5, borderColor: '#94a3b8' },
   flightLineBar: { flex: 1, height: 1.5, backgroundColor: '#cbd5e1' },
-  flightArrow: { width: 0, height: 0, borderTopWidth: 5, borderBottomWidth: 5, borderLeftWidth: 8,
-    borderTopColor: 'transparent', borderBottomColor: 'transparent', borderLeftColor: '#94a3b8' },
+
   flightCabin: { fontSize: 10, color: '#94a3b8', marginTop: 4 },
   flightFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f1f5f9' },
