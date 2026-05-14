@@ -30,6 +30,8 @@ export interface MessagePayload {
   type?: "text" | "flight_card" | "hotel_card" | "car_card" | "tour_card" | "quick_replies";
   options?: string[];
   data?: Record<string, unknown>;
+  cards?: any[];
+  [key: string]: any;
 }
 
 export interface StructuredState {
