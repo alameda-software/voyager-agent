@@ -22,16 +22,67 @@ interface ChatMessage {
   payload?: MessagePayload | null;
 }
 
+function FlightCard({ card }: { card: any }) {
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardRow}>
+        <Text style={styles.cardAirline}>{card.airline}</Text>
+        <Text style={styles.cardPrice}>€{card.price_per_person}<Text style={styles.cardPriceSub}>/pax</Text></Text>
+      </View>
+      <View style={styles.cardRow}>
+        <View style={styles.cardFlight}>
+          <Text style={styles.cardTime}>{card.departure}</Text>
+          <Text style={styles.cardIata}>{card.origin}</Text>
+        </View>
+        <View style={styles.cardMiddle}>
+          <Text style={styles.cardDuration}>{card.duration}</Text>
+          <Text style={styles.cardStops}>{card.stops_label}</Text>
+        </View>
+        <View style={[styles.cardFlight, { alignItems: 'flex-end' }]}>
+          <Text style={styles.cardTime}>{card.arrival}</Text>
+          <Text style={styles.cardIata}>{card.destination}</Text>
+        </View>
+      </View>
+      <Text style={styles.cardSeats}>{card.seats_left} seats left · {card.cabin}</Text>
+    </View>
+  );
+}
+
+function VendorCard({ card }: { card: any }) {
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardRow}>
+        <Text style={styles.cardAirline}>{card.name}</Text>
+        <Text style={styles.cardRating}>⭐ {card.rating}</Text>
+      </View>
+      <Text style={styles.cardStyle}>{card.style}</Text>
+      <Text style={styles.cardSeats}>
+        {card.price_per_head ? `From €${card.price_per_head}/head` : card.price_from ? `From €${card.price_from}` : ''}
+        {card.reviews ? ` · ${card.reviews} reviews` : ''}
+      </Text>
+    </View>
+  );
+}
+
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
-  const actionHints = message.payload?.suggested_actions ?? [];
+  const cards = message.payload?.cards ?? [];
+  const mode = message.payload?.mode;
 
   return (
     <View style={[styles.messageContainer, { alignItems: isUser ? "flex-end" : "flex-start" }]}>
       <View style={[styles.bubble, isUser ? styles.userBubble : styles.agentBubble]}>
         <Text style={isUser ? styles.userText : styles.agentText}>{message.content}</Text>
-
       </View>
+      {cards.length > 0 && (
+        <View style={styles.cardsContainer}>
+          {cards.map((card: any, i: number) => (
+            mode === 'flight_results'
+              ? <FlightCard key={i} card={card} />
+              : <VendorCard key={i} card={card} />
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -208,4 +259,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  cardsContainer: { marginTop: 8, gap: 8, width: '100%' },
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  cardAirline: { fontSize: 15, fontWeight: "700", color: "#0f172a" },
+  cardPrice: { fontSize: 18, fontWeight: "800", color: "#2563eb" },
+  cardPriceSub: { fontSize: 12, fontWeight: "400", color: "#64748b" },
+  cardFlight: { alignItems: "flex-start" },
+  cardMiddle: { alignItems: "center", flex: 1 },
+  cardTime: { fontSize: 18, fontWeight: "700", color: "#0f172a" },
+  cardIata: { fontSize: 12, color: "#64748b", marginTop: 2 },
+  cardDuration: { fontSize: 12, color: "#64748b" },
+  cardStops: { fontSize: 11, color: "#2563eb", fontWeight: "600", marginTop: 2 },
+  cardSeats: { fontSize: 12, color: "#94a3b8", marginTop: 4 },
+  cardStyle: { fontSize: 13, color: "#475569", marginBottom: 4 },
+  cardRating: { fontSize: 14, fontWeight: "700", color: "#f59e0b" },
 });
