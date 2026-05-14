@@ -94,6 +94,16 @@ class ConciergeService:
         self.db.add(user_message)
         await self.db.flush()
 
+        # Get full message history BEFORE this new message for context
+        existing_messages = await self._get_messages(conversation_id)
+        history = [
+            {"role": "user" if m.role == "user" else "assistant", "content": m.content}
+            for m in existing_messages
+            if m.role in ("user", "agent") and m.content
+        ]
+        # Append current user message
+        history.append({"role": "user", "content": content.strip()})
+
         structured_state.payload = self._merge_state(
             domain=conversation.domain,
             state=structured_state.payload,
@@ -104,6 +114,7 @@ class ConciergeService:
         agent_reply = self._agent_reply(
             domain=conversation.domain,
             state=structured_state.payload,
+            history=history,
         )
         agent_message = Message(
             conversation_id=conversation.id,
@@ -192,8 +203,8 @@ class ConciergeService:
     def _merge_state(self, domain: ConciergeDomain, state: dict, user_message: str) -> dict:
         return get_domain_pack(domain).merge_state(state, user_message)
 
-    def _agent_reply(self, domain: ConciergeDomain, state: dict):
-        return get_domain_pack(domain).agent_reply(state)
+    def _agent_reply(self, domain: ConciergeDomain, state: dict, history: list | None = None):
+        return get_domain_pack(domain).agent_reply(state, history=history or [])
 
     def _conversation_summary(self, conversation: Conversation) -> ConversationSummary:
         return ConversationSummary(

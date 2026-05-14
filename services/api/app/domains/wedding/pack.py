@@ -50,20 +50,16 @@ class WeddingPack:
         }
 
     def merge_state(self, state: dict, user_message: str) -> dict:
-        notes = list(state.get("notes", []))
-        notes.append(user_message.strip())
-        return {**state, "notes": notes[-30:]}
+        return {**state}  # History-driven now
 
-    def agent_reply(self, state: dict) -> DomainReply:
+    def agent_reply(self, state: dict, history: list | None = None) -> DomainReply:
         from app.config import settings
         from app.services.fake_data import search_vendors
         from openai import OpenAI
 
-        notes = state.get("notes", [])
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        for i, note in enumerate(notes):
-            role = "user" if i % 2 == 0 else "assistant"
-            messages.append({"role": role, "content": note})
+        for msg in (history or []):
+            messages.append({"role": msg["role"], "content": msg["content"]})
 
         client = OpenAI(api_key=settings.openai_api_key)
 

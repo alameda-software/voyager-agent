@@ -8,13 +8,13 @@ from app.models import ConciergeDomain
 FUNCTIONS = [
     {
         "name": "search_flights",
-        "description": "Search flights when you have origin, destination, and approximate dates.",
+        "description": "Search flights when you have origin, destination, and approximate dates. Only call this once unless the user asks to search again.",
         "parameters": {
             "type": "object",
             "properties": {
-                "origin": {"type": "string", "description": "Origin city or airport"},
-                "destination": {"type": "string", "description": "Destination city or airport"},
-                "date": {"type": "string", "description": "Travel date or month"},
+                "origin": {"type": "string"},
+                "destination": {"type": "string"},
+                "date": {"type": "string"},
                 "adults": {"type": "integer"},
                 "children": {"type": "integer"},
             },
@@ -23,14 +23,14 @@ FUNCTIONS = [
     },
     {
         "name": "search_hotels",
-        "description": "Search hotels at the destination when you know where and roughly when.",
+        "description": "Search hotels at the destination.",
         "parameters": {
             "type": "object",
             "properties": {
-                "destination": {"type": "string", "description": "City or destination"},
-                "checkin": {"type": "string", "description": "Check-in date"},
-                "checkout": {"type": "string", "description": "Check-out date"},
-                "nights": {"type": "integer", "description": "Number of nights"},
+                "destination": {"type": "string"},
+                "checkin": {"type": "string"},
+                "checkout": {"type": "string"},
+                "nights": {"type": "integer"},
                 "adults": {"type": "integer"},
                 "children": {"type": "integer"},
             },
@@ -39,31 +39,47 @@ FUNCTIONS = [
     },
     {
         "name": "search_car_rentals",
-        "description": "Search car rentals at the destination when the user needs a car.",
+        "description": "Search car rentals when the user needs a car.",
         "parameters": {
             "type": "object",
             "properties": {
-                "location": {"type": "string", "description": "Pickup city or airport"},
+                "location": {"type": "string"},
                 "pickup_date": {"type": "string"},
                 "dropoff_date": {"type": "string"},
-                "days": {"type": "integer", "description": "Number of rental days"},
-                "category": {"type": "string", "description": "economy, compact, suv, premium, family"},
+                "days": {"type": "integer"},
+                "category": {"type": "string"},
             },
             "required": ["location"],
+        },
+    },
+    {
+        "name": "confirm_booking",
+        "description": "Call this when the user selects a specific flight, hotel or car and wants to book it.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "item_type": {"type": "string", "enum": ["flight", "hotel", "car"]},
+                "item_description": {"type": "string", "description": "e.g. 'easyJet 13:35 LHR-SVQ €139'"},
+                "total_price": {"type": "number"},
+                "currency": {"type": "string"},
+            },
+            "required": ["item_type", "item_description"],
         },
     },
 ]
 
 SYSTEM_PROMPT = """You are Voyager, a friendly AI travel concierge.
-Help the user plan their perfect trip step by step.
-Gather: origin, destination, dates, number of travellers, budget, and whether they need a hotel or car.
-- Once you have origin + destination + dates + travellers → call search_flights
-- Once you know destination + dates → offer to call search_hotels
-- If user mentions needing a car → call search_car_rentals
-IMPORTANT: When you call a search function, the results will be shown as visual cards to the user.
-DO NOT list the results as numbered text — just write a short 1-2 sentence intro and ask what they need next.
-Example good response after flights: "Here are the best options for your trip! Would you also like hotels or a rental car?"
-Be concise and warm. Never repeat yourself."""
+Help the user plan their perfect trip conversationally.
+
+Rules:
+- Gather origin, destination, dates, travellers naturally through conversation
+- Call search_flights once you have enough info. Do NOT call it again unless user asks.
+- After showing flights, ask if they need hotels or a car
+- Call search_hotels or search_car_rentals when needed
+- When the user says they want to SELECT or BOOK a specific option (e.g. "I'll take the easyJet", "book the Volotea", "I want that hotel") → call confirm_booking
+- After confirming a booking, congratulate them and ask what else they need
+- Be warm, concise. Max 2 sentences unless showing options.
+- NEVER re-list search results as text — the cards are shown visually."""
 
 
 class VoyagerPack:
@@ -73,30 +89,25 @@ class VoyagerPack:
         return {
             "title": title,
             "status": "collecting_requirements",
-            "notes": [],
             "origin": None,
             "destination": None,
             "dates": None,
             "travellers": {"adults": 1, "children": 0},
             "budget": None,
-            "needs_hotel": None,
-            "needs_car": None,
+            "bookings": [],
         }
 
     def merge_state(self, state: dict, user_message: str) -> dict:
-        notes = list(state.get("notes", []))
-        notes.append(user_message.strip())
-        return {**state, "notes": notes[-30:]}
+        return {**state}  # State is now driven by history, not notes
 
-    def agent_reply(self, state: dict) -> DomainReply:
+    def agent_reply(self, state: dict, history: list | None = None) -> DomainReply:
         from app.config import settings
         from app.services.fake_data import search_flights, search_hotels, search_car_rentals
         from openai import OpenAI
 
-        notes = state.get("notes", [])
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        for i, note in enumerate(notes):
-            messages.append({"role": "user" if i % 2 == 0 else "assistant", "content": note})
+        for msg in (history or []):
+            messages.append({"role": msg["role"], "content": msg["content"]})
 
         client = OpenAI(api_key=settings.openai_api_key)
 
@@ -143,22 +154,32 @@ class VoyagerPack:
                         category=args.get("category"),
                     )
                     mode = "car_results"
+                elif fn == "confirm_booking":
+                    item = args.get("item_description", "your selection")
+                    price = args.get("total_price")
+                    price_str = f" — €{price}" if price else ""
+                    reply_text = f"✅ Perfect! I've noted your booking: **{item}**{price_str}. Would you like to add hotels, a car, or is there anything else for your trip?"
+                    return DomainReply(
+                        content=reply_text,
+                        payload={"mode": "booking_confirmed", "domain": self.domain.value,
+                                 "booking": args},
+                    )
                 else:
                     cards, mode = [], "llm"
 
-                # Feed results back for natural summary
-                messages.append({"role": "assistant", "content": None,
-                                  "function_call": {"name": fn, "arguments": msg.function_call.arguments}})
-                messages.append({"role": "function", "name": fn, "content": json.dumps(cards[:4])})
-                follow_up = client.chat.completions.create(
-                    model=settings.llm_model, messages=messages,
-                    max_tokens=250, temperature=0.7,
-                )
-                reply_text = follow_up.choices[0].message.content.strip()
-                return DomainReply(
-                    content=reply_text,
-                    payload={"mode": mode, "domain": self.domain.value, "cards": cards[:4]},
-                )
+                if fn in ("search_flights", "search_hotels", "search_car_rentals"):
+                    messages.append({"role": "assistant", "content": None,
+                                     "function_call": {"name": fn, "arguments": msg.function_call.arguments}})
+                    messages.append({"role": "function", "name": fn, "content": json.dumps(cards[:4])})
+                    follow_up = client.chat.completions.create(
+                        model=settings.llm_model, messages=messages,
+                        max_tokens=150, temperature=0.7,
+                    )
+                    reply_text = follow_up.choices[0].message.content.strip()
+                    return DomainReply(
+                        content=reply_text,
+                        payload={"mode": mode, "domain": self.domain.value, "cards": cards[:4]},
+                    )
 
             reply_text = msg.content.strip() if msg.content else "¿A dónde te gustaría viajar?"
 
