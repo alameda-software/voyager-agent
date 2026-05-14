@@ -6,8 +6,8 @@ export default function RootLayout() {
     <Stack
       screenOptions={{
         animation: Platform.OS === 'web' ? 'none' : 'default',
-        contentStyle: { backgroundColor: '#0b1220' },
-        headerStyle: { backgroundColor: '#0b1220' },
+        contentStyle: { backgroundColor: '#ffffff' },
+        headerStyle: { backgroundColor: '#ffffff' },
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />

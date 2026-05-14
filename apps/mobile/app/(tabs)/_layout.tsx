@@ -6,13 +6,13 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        sceneStyle: { backgroundColor: "#0b1220" },
+        sceneStyle: { backgroundColor: "#ffffff" },
         tabBarStyle: {
-          backgroundColor: "#0f172a",
-          borderTopColor: "#1e293b",
+          backgroundColor: "#ffffff",
+          borderTopColor: "#e2e8f0",
         },
-        tabBarActiveTintColor: "#7dd3fc",
-        tabBarInactiveTintColor: "#475569",
+        tabBarActiveTintColor: "#2563eb",
+        tabBarInactiveTintColor: "#94a3b8",
       }}
     >
       <Tabs.Screen

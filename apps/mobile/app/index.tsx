@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     minHeight: '100%',
-    backgroundColor: "#0b1220",
+    backgroundColor: "#ffffff",
     paddingHorizontal: 24,
     paddingTop: 56,
     paddingBottom: 60,
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   eyebrow: {
-    color: "#7dd3fc",
+    color: "#2563eb",
     fontSize: 13,
     fontWeight: "700",
     textTransform: "uppercase",
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: {
-    color: "#f8fafc",
+    color: "#0f172a",
     fontSize: 34,
     lineHeight: 40,
     fontWeight: "800",
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     maxWidth: 520,
   },
   subtitle: {
-    color: "#94a3b8",
+    color: "#64748b",
     fontSize: 16,
     lineHeight: 24,
     maxWidth: 640,
@@ -130,11 +130,11 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   card: {
-    backgroundColor: "#111827",
+    backgroundColor: "#f8fafc",
     borderRadius: 22,
     padding: 22,
     borderWidth: 1,
-    borderColor: "#1f2937",
+    borderColor: "#e2e8f0",
   },
   iconWrap: {
     width: 56,
@@ -146,19 +146,19 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   cardTitle: {
-    color: "#f8fafc",
+    color: "#0f172a",
     fontSize: 24,
     fontWeight: "700",
     marginBottom: 8,
   },
   cardSubtitle: {
-    color: "#94a3b8",
+    color: "#64748b",
     fontSize: 15,
     lineHeight: 22,
     marginBottom: 18,
   },
   cardAction: {
-    color: "#7dd3fc",
+    color: "#2563eb",
     fontSize: 15,
     fontWeight: "700",
   },
