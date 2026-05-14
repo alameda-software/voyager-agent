@@ -1,6 +1,10 @@
 """
-Wedding vendor data seeded from Bodas.net public listings (Seville, 2025).
-Used for pre-MVP demo purposes only - internal use.
+Travel inventory fixtures for Voyager pre-MVP.
+- Flights: generated dynamically (realistic pricing)
+- Hotels: curated fixtures per city
+- Car rentals: curated fixtures per city
+- Wedding vendors: seeded from Bodas.net (Seville, 2025)
+All used for demo/pre-MVP purposes only.
 """
 
 from __future__ import annotations
@@ -207,6 +211,207 @@ def search_flights(origin: str, destination: str, date: str | None = None,
         })
     results.sort(key=lambda x: x["price_per_person"])
     return results
+
+
+# ── Hotels ───────────────────────────────────────────────────────────────────
+HOTELS = {
+    "default": [
+        {"name": "Hotel Alfonso XIII", "chain": "Luxury Collection", "stars": 5,
+         "location": "Centro, Sevilla", "price_per_night": 420, "rating": 9.2,
+         "reviews": 3841, "amenities": ["Pool", "Spa", "Bar", "Restaurant", "Parking"],
+         "description": "Palacio histórico de 1928. El hotel más icónico de Sevilla."},
+        {"name": "Hotel Mercer Sevilla", "chain": "Mercer Hotels", "stars": 5,
+         "location": "Santa Cruz, Sevilla", "price_per_night": 380, "rating": 9.4,
+         "reviews": 1203, "amenities": ["Rooftop Pool", "Spa", "Restaurant", "Gym"],
+         "description": "Palacio del s. XVI en el corazón de Santa Cruz."},
+        {"name": "EME Catedral Hotel", "chain": "Independent", "stars": 5,
+         "location": "Catedral, Sevilla", "price_per_night": 295, "rating": 9.0,
+         "reviews": 2567, "amenities": ["Rooftop Pool", "Bar", "Restaurant", "Terrace"],
+         "description": "Vistas directas a la Giralda. Rooftop bar espectacular."},
+        {"name": "Hotel Hospes Las Casas del Rey de Baeza", "chain": "Hospes", "stars": 4,
+         "location": "Santa Cruz, Sevilla", "price_per_night": 185, "rating": 9.1,
+         "reviews": 1876, "amenities": ["Pool", "Restaurant", "Bar", "Terrace"],
+         "description": "Casa señorial del s. XVIII. Patio andaluz incomparable."},
+        {"name": "Hotel Boutique Doña Lina", "chain": "Independent", "stars": 4,
+         "location": "Centro, Sevilla", "price_per_night": 145, "rating": 8.9,
+         "reviews": 987, "amenities": ["Pool", "Bar", "Terrace", "Free WiFi"],
+         "description": "Hotel boutique con patio sevillano y encanto personal."},
+    ],
+    "london": [
+        {"name": "The Savoy", "chain": "Fairmont", "stars": 5,
+         "location": "Strand, London", "price_per_night": 650, "rating": 9.3,
+         "reviews": 5621, "amenities": ["Spa", "Pool", "Restaurant", "Bar", "Gym"],
+         "description": "El hotel más icónico de Londres desde 1889."},
+        {"name": "Shangri-La The Shard", "chain": "Shangri-La", "stars": 5,
+         "location": "London Bridge, London", "price_per_night": 490, "rating": 9.1,
+         "reviews": 3241, "amenities": ["Pool", "Spa", "Restaurant", "Sky Bar", "Gym"],
+         "description": "Vistas panorámicas de Londres desde el icónico The Shard."},
+        {"name": "citizenM Tower of London", "chain": "citizenM", "stars": 4,
+         "location": "Tower Hill, London", "price_per_night": 165, "rating": 8.8,
+         "reviews": 8934, "amenities": ["Bar", "Free WiFi", "Gym", "24h Reception"],
+         "description": "Diseño moderno, precio inteligente, ubicación perfecta."},
+        {"name": "Premier Inn London City", "chain": "Premier Inn", "stars": 3,
+         "location": "City of London", "price_per_night": 119, "rating": 8.4,
+         "reviews": 12043, "amenities": ["Restaurant", "Bar", "Free WiFi"],
+         "description": "Calidad garantizada Premier Inn en pleno corazón financiero."},
+        {"name": "Point A Hotel London Kings Cross", "chain": "Point A", "stars": 3,
+         "location": "Kings Cross, London", "price_per_night": 89, "rating": 8.2,
+         "reviews": 6712, "amenities": ["Free WiFi", "24h Reception", "Bar"],
+         "description": "Compacto, eficiente y bien conectado. Ideal para city breaks."},
+    ],
+    "paris": [
+        {"name": "Le Meurice", "chain": "Dorchester Collection", "stars": 5,
+         "location": "1er arrondissement, Paris", "price_per_night": 890, "rating": 9.5,
+         "reviews": 2341, "amenities": ["Spa", "Restaurant", "Bar", "Concierge"],
+         "description": "El hotel de los reyes. Frente a las Tullerías."},
+        {"name": "Hotel des Grands Boulevards", "chain": "Independent", "stars": 4,
+         "location": "2e arrondissement, Paris", "price_per_night": 245, "rating": 9.0,
+         "reviews": 1876, "amenities": ["Restaurant", "Bar", "Terrace", "Free WiFi"],
+         "description": "Boutique hotel con restaurante de culto en los Grandes Bulevares."},
+        {"name": "Generator Paris", "chain": "Generator", "stars": 3,
+         "location": "10e arrondissement, Paris", "price_per_night": 75, "rating": 8.3,
+         "reviews": 9823, "amenities": ["Bar", "Free WiFi", "Restaurant", "Lounge"],
+         "description": "Diseño urbano, ambiente social, precio imbatible en París."},
+    ],
+    "madrid": [
+        {"name": "Hotel Ritz Madrid", "chain": "Mandarin Oriental", "stars": 5,
+         "location": "Paseo del Prado, Madrid", "price_per_night": 580, "rating": 9.4,
+         "reviews": 3241, "amenities": ["Spa", "Pool", "Restaurant", "Bar", "Gym"],
+         "description": "El gran hotel de Madrid desde 1910. Restaurado con exquisitez."},
+        {"name": "Vincci The Mint", "chain": "Vincci", "stars": 4,
+         "location": "Gran Vía, Madrid", "price_per_night": 175, "rating": 8.9,
+         "reviews": 2109, "amenities": ["Rooftop Bar", "Restaurant", "Free WiFi", "Gym"],
+         "description": "Hotel de diseño en la Gran Vía con rooftop con vistas."},
+        {"name": "Room Mate Oscar", "chain": "Room Mate", "stars": 4,
+         "location": "Chueca, Madrid", "price_per_night": 135, "rating": 8.7,
+         "reviews": 3876, "amenities": ["Rooftop Pool", "Bar", "Free WiFi"],
+         "description": "Hotel boutique vibrante en el barrio más animado de Madrid."},
+    ],
+}
+
+# ── Car Rentals ───────────────────────────────────────────────────────────────
+CAR_RENTALS = [
+    {"company": "Europcar", "logo_hint": "🟢",
+     "cars": [
+         {"category": "Economy", "model": "VW Polo o similar", "doors": 5,
+          "seats": 5, "transmission": "Manual", "ac": True,
+          "price_per_day": 28, "price_total_hint": True,
+          "included": ["Seguro básico", "Kilometraje ilimitado"],
+          "extras": ["GPS +5€/día", "Conductor adicional +8€/día"]},
+         {"category": "Compact", "model": "VW Golf o similar", "doors": 5,
+          "seats": 5, "transmission": "Manual", "ac": True,
+          "price_per_day": 42, "price_total_hint": True,
+          "included": ["Seguro completo", "Kilometraje ilimitado"],
+          "extras": ["GPS +5€/día", "Silla bebé +8€/día"]},
+         {"category": "SUV", "model": "Seat Ateca o similar", "doors": 5,
+          "seats": 5, "transmission": "Automático", "ac": True,
+          "price_per_day": 68, "price_total_hint": True,
+          "included": ["Seguro completo", "Kilometraje ilimitado"],
+          "extras": ["GPS +5€/día"]},
+     ]},
+    {"company": "Hertz", "logo_hint": "🟡",
+     "cars": [
+         {"category": "Economy", "model": "Fiat 500 o similar", "doors": 3,
+          "seats": 4, "transmission": "Manual", "ac": True,
+          "price_per_day": 32, "price_total_hint": True,
+          "included": ["Seguro básico", "250km/día"],
+          "extras": ["Km ilimitado +6€/día", "GPS +6€/día"]},
+         {"category": "Compact", "model": "Toyota Corolla o similar", "doors": 4,
+          "seats": 5, "transmission": "Automático", "ac": True,
+          "price_per_day": 55, "price_total_hint": True,
+          "included": ["Seguro completo", "Kilometraje ilimitado"],
+          "extras": ["GPS +6€/día", "Conductor joven +10€/día"]},
+     ]},
+    {"company": "Sixt", "logo_hint": "🟠",
+     "cars": [
+         {"category": "Economy", "model": "Opel Corsa o similar", "doors": 5,
+          "seats": 5, "transmission": "Manual", "ac": True,
+          "price_per_day": 29, "price_total_hint": True,
+          "included": ["Seguro básico", "Kilometraje ilimitado"],
+          "extras": ["GPS +4€/día", "Seguro premium +12€/día"]},
+         {"category": "Premium", "model": "BMW Serie 3 o similar", "doors": 4,
+          "seats": 5, "transmission": "Automático", "ac": True,
+          "price_per_day": 95, "price_total_hint": True,
+          "included": ["Seguro completo", "Kilometraje ilimitado"],
+          "extras": ["GPS incluido", "Conductor adicional +8€/día"]},
+     ]},
+    {"company": "Avis", "logo_hint": "🔴",
+     "cars": [
+         {"category": "Economy", "model": "Renault Clio o similar", "doors": 5,
+          "seats": 5, "transmission": "Manual", "ac": True,
+          "price_per_day": 31, "price_total_hint": True,
+          "included": ["Seguro básico", "Kilometraje ilimitado"],
+          "extras": ["GPS +5€/día", "Seguro total +15€/día"]},
+         {"category": "Family", "model": "Peugeot 3008 o similar", "doors": 5,
+          "seats": 7, "transmission": "Automático", "ac": True,
+          "price_per_day": 72, "price_total_hint": True,
+          "included": ["Seguro completo", "Kilometraje ilimitado"],
+          "extras": ["Silla bebé +7€/día", "GPS +5€/día"]},
+     ]},
+]
+
+
+def search_hotels(destination: str, checkin: str | None = None, checkout: str | None = None,
+                 adults: int = 1, children: int = 0, nights: int = 3) -> list[dict]:
+    """Return hotel options for a destination."""
+    dest_lower = destination.lower()
+    city_key = "default"
+    for key in HOTELS:
+        if key in dest_lower:
+            city_key = key
+            break
+    # Also match by airport code
+    if city_key == "default":
+        iata = _guess_iata(destination)
+        if iata == "LHR" or iata == "LGW" or iata == "STN":
+            city_key = "london"
+        elif iata == "CDG" or iata == "ORY":
+            city_key = "paris"
+        elif iata == "MAD":
+            city_key = "madrid"
+
+    pool = HOTELS.get(city_key, HOTELS["default"])
+    results = []
+    for h in random.sample(pool, min(4, len(pool))):
+        total = h["price_per_night"] * max(1, nights)
+        results.append({
+            "type": "hotel_card",
+            **h,
+            "nights": nights,
+            "total_price": total,
+            "currency": "EUR",
+            "checkin": checkin or "Flexible",
+            "checkout": checkout or "Flexible",
+        })
+    results.sort(key=lambda x: x["price_per_night"])
+    return results
+
+
+def search_car_rentals(location: str, pickup_date: str | None = None,
+                       dropoff_date: str | None = None, days: int = 3,
+                       category: str | None = None) -> list[dict]:
+    """Return car rental options."""
+    results = []
+    cat_lower = (category or "").lower()
+    for company in CAR_RENTALS:
+        for car in company["cars"]:
+            if cat_lower and cat_lower not in car["category"].lower():
+                continue
+            total = car["price_per_day"] * max(1, days)
+            results.append({
+                "type": "car_card",
+                "company": company["company"],
+                "logo_hint": company["logo_hint"],
+                **car,
+                "days": days,
+                "total_price": total,
+                "currency": "EUR",
+                "pickup_location": location,
+                "pickup_date": pickup_date or "Flexible",
+                "dropoff_date": dropoff_date or "Flexible",
+            })
+    results.sort(key=lambda x: x["price_per_day"])
+    return results[:8]
 
 
 def search_vendors(category: str = "all", location: str = "Seville",

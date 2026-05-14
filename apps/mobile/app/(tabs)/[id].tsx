@@ -57,8 +57,49 @@ function VendorCard({ card }: { card: any }) {
       </View>
       <Text style={styles.cardStyle}>{card.style}</Text>
       <Text style={styles.cardSeats}>
-        {card.price_per_head ? `From €${card.price_per_head}/head` : card.price_from ? `From €${card.price_from}` : ''}
-        {card.reviews ? ` · ${card.reviews} reviews` : ''}
+        {card.price_per_head ? `Desde €${card.price_per_head}/persona` : card.price_from ? `Desde €${card.price_from}` : ''}
+        {card.reviews ? ` · ${card.reviews} opiniones` : ''}
+        {card.badge ? `  ${card.badge}` : ''}
+      </Text>
+    </View>
+  );
+}
+
+function HotelCard({ card }: { card: any }) {
+  const stars = '⭐'.repeat(card.stars || 3);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cardAirline}>{card.name}</Text>
+          <Text style={styles.cardStyle}>{card.location}</Text>
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={styles.cardPrice}>€{card.price_per_night}<Text style={styles.cardPriceSub}>/noche</Text></Text>
+          <Text style={styles.cardStops}>{stars}</Text>
+        </View>
+      </View>
+      <Text style={styles.cardSeats}>{card.description}</Text>
+      <Text style={styles.cardSeats}>★ {card.rating} · {card.reviews} opiniones · {card.nights} noches = €{card.total_price}</Text>
+    </View>
+  );
+}
+
+function CarCard({ card }: { card: any }) {
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cardAirline}>{card.company} · {card.category}</Text>
+          <Text style={styles.cardStyle}>{card.model}</Text>
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={styles.cardPrice}>€{card.price_per_day}<Text style={styles.cardPriceSub}>/día</Text></Text>
+          <Text style={styles.cardSeats}>{card.days} días = €{card.total_price}</Text>
+        </View>
+      </View>
+      <Text style={styles.cardSeats}>
+        {card.transmission} · {card.seats} plazas · {card.ac ? 'AC' : ''} · {(card.included || []).join(', ')}
       </Text>
     </View>
   );
@@ -76,11 +117,12 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       </View>
       {cards.length > 0 && (
         <View style={styles.cardsContainer}>
-          {cards.map((card: any, i: number) => (
-            mode === 'flight_results'
-              ? <FlightCard key={i} card={card} />
-              : <VendorCard key={i} card={card} />
-          ))}
+          {cards.map((card: any, i: number) => {
+            if (mode === 'flight_results') return <FlightCard key={i} card={card} />;
+            if (mode === 'hotel_results') return <HotelCard key={i} card={card} />;
+            if (mode === 'car_results') return <CarCard key={i} card={card} />;
+            return <VendorCard key={i} card={card} />;
+          })}
         </View>
       )}
     </View>
