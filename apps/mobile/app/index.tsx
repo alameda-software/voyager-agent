@@ -1,30 +1,28 @@
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-
 import { createConversation } from "../src/api/client";
 import type { ConciergeDomain } from "../src/types";
 
 const TEST_USER_ID = 1;
 
-const DOMAIN_OPTIONS: Array<{
-  domain: ConciergeDomain;
-  title: string;
-  subtitle: string;
-  icon: keyof typeof Ionicons.glyphMap;
-}> = [
+const DOMAIN_OPTIONS = [
   {
-    domain: "voyager",
+    domain: "voyager" as ConciergeDomain,
     title: "Voyager",
-    subtitle: "Plan trips, compare routes, and build itineraries.",
-    icon: "airplane",
+    subtitle: "Flights, hotels, cars & itineraries",
+    icon: "airplane" as const,
+    color: "#2563eb",
+    bg: "#eff6ff",
   },
   {
-    domain: "wedding",
+    domain: "wedding" as ConciergeDomain,
     title: "Wedding",
-    subtitle: "Shortlist venues, vendors, and planning priorities.",
-    icon: "heart",
+    subtitle: "Venues, vendors & planning",
+    icon: "heart" as const,
+    color: "#db2777",
+    bg: "#fdf2f8",
   },
 ];
 
@@ -35,12 +33,7 @@ export default function HomeScreen() {
     try {
       setActiveDomain(domain);
       const title = domain === "voyager" ? "Voyager planning session" : "Wedding planning session";
-      const response = await createConversation({
-        user_id: TEST_USER_ID,
-        domain,
-        title,
-      });
-
+      const response = await createConversation({ user_id: TEST_USER_ID, domain, title });
       router.replace({
         pathname: "/(tabs)/[id]",
         params: {
@@ -55,111 +48,90 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.hero}>
-        <Text style={styles.eyebrow}>Pre-MVP Concierge Engine</Text>
-        <Text style={styles.title}>Choose the concierge mode you want to test.</Text>
-        <Text style={styles.subtitle}>
-          Both flows share the same backend session engine, but load different domain logic.
-        </Text>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.logo}>✦ Concierge</Text>
+        <Text style={styles.title}>What are you planning?</Text>
+        <Text style={styles.subtitle}>Your AI assistant will guide you step by step.</Text>
       </View>
 
+      {/* Domain cards */}
       <View style={styles.grid}>
         {DOMAIN_OPTIONS.map((option) => {
           const loading = activeDomain === option.domain;
           return (
             <TouchableOpacity
               key={option.domain}
-              style={styles.card}
+              style={[styles.card, { borderColor: option.color + "33" }]}
               onPress={() => handleStart(option.domain)}
               disabled={activeDomain !== null}
+              activeOpacity={0.85}
             >
-              <View style={styles.iconWrap}>
-                {loading ? (
-                  <ActivityIndicator color="#ffffff" />
-                ) : (
-                  <Ionicons name={option.icon} size={28} color="#ffffff" />
-                )}
+              <View style={[styles.iconWrap, { backgroundColor: option.bg }]}>
+                {loading
+                  ? <ActivityIndicator color={option.color} size="small" />
+                  : <Ionicons name={option.icon} size={22} color={option.color} />
+                }
               </View>
-              <Text style={styles.cardTitle}>{option.title}</Text>
-              <Text style={styles.cardSubtitle}>{option.subtitle}</Text>
-              <Text style={styles.cardAction}>Open {option.title}</Text>
+              <View style={styles.cardText}>
+                <Text style={styles.cardTitle}>{option.title}</Text>
+                <Text style={styles.cardSubtitle}>{option.subtitle}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#cbd5e1" />
             </TouchableOpacity>
           );
         })}
       </View>
-    </View>
+
+      {/* Recent hint */}
+      <Text style={styles.hint}>Tap a mode to start chatting with your AI concierge</Text>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: "#ffffff" },
   container: {
-    flex: 1,
-    minHeight: '100%',
+    flexGrow: 1,
     backgroundColor: "#ffffff",
-    paddingHorizontal: 24,
-    paddingTop: 56,
-    paddingBottom: 60,
+    paddingHorizontal: 20,
+    paddingTop: 64,
+    paddingBottom: 32,
   },
-  hero: {
-    marginBottom: 32,
-  },
-  eyebrow: {
-    color: "#2563eb",
-    fontSize: 13,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 12,
-  },
-  title: {
-    color: "#0f172a",
-    fontSize: 34,
-    lineHeight: 40,
-    fontWeight: "800",
-    marginBottom: 12,
-    maxWidth: 520,
-  },
-  subtitle: {
-    color: "#64748b",
-    fontSize: 16,
-    lineHeight: 24,
-    maxWidth: 640,
-  },
-  grid: {
-    gap: 16,
-  },
+  header: { marginBottom: 28 },
+  logo: { fontSize: 13, fontWeight: "700", color: "#2563eb", letterSpacing: 1, marginBottom: 10, textTransform: "uppercase" },
+  title: { fontSize: 26, fontWeight: "800", color: "#0f172a", lineHeight: 32, marginBottom: 8 },
+  subtitle: { fontSize: 14, color: "#64748b", lineHeight: 20 },
+  grid: { gap: 12 },
   card: {
-    backgroundColor: "#f8fafc",
-    borderRadius: 22,
-    padding: 22,
-    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1.5,
     borderColor: "#e2e8f0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   iconWrap: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: "#2563eb",
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 18,
+    marginRight: 14,
   },
-  cardTitle: {
-    color: "#0f172a",
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  cardSubtitle: {
-    color: "#64748b",
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 18,
-  },
-  cardAction: {
-    color: "#2563eb",
-    fontSize: 15,
-    fontWeight: "700",
-  },
+  cardText: { flex: 1 },
+  cardTitle: { fontSize: 16, fontWeight: "700", color: "#0f172a", marginBottom: 2 },
+  cardSubtitle: { fontSize: 13, color: "#64748b", lineHeight: 18 },
+  hint: { marginTop: 28, fontSize: 12, color: "#94a3b8", textAlign: "center" },
 });
