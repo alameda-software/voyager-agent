@@ -24,6 +24,7 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen name="[id]" options={{ href: null }} />
       <Tabs.Screen
         name="search"
         options={{
