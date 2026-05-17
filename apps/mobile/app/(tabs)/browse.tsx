@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, Platform, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+
+const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 44 : (StatusBar.currentHeight ?? 24);
 
 const CATEGORIES = [
   { id: "venue",       label: "Venues",      emoji: "🏛️" },
@@ -206,9 +208,9 @@ export default function BrowseScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
   header: { fontSize: 22, fontWeight: "800", color: "#0f172a", paddingHorizontal: 16, paddingTop: 56, paddingBottom: 10 },
-  hero: { width: '100%', height: 180, position: 'relative' },
-  heroImage: { width: '100%', height: 180 },
-  heroOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, backgroundColor: 'rgba(0,0,0,0.38)' },
+  hero: { width: '100%', height: 200 + STATUS_BAR_HEIGHT, position: 'relative' },
+  heroImage: { width: '100%', height: 200 + STATUS_BAR_HEIGHT },
+  heroOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'flex-end', paddingBottom: 16, paddingHorizontal: 16, paddingTop: STATUS_BAR_HEIGHT, backgroundColor: 'rgba(0,0,0,0.32)' },
   heroEmoji: { fontSize: 28, marginBottom: 2 },
   heroTitle: { fontSize: 22, fontWeight: '800', color: '#ffffff' },
   tabScroll: { maxHeight: 56, flexGrow: 0 },
