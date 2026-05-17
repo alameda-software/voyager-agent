@@ -194,7 +194,8 @@ export default function BrowseScreen() {
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {vendors.map((v, i) => {
           const imgs = CATEGORY_IMAGES[activeCategory] || [];
-          const imgUrl = imgs[i % imgs.length];
+          // Start from index 1 so cards don't repeat the hero image
+          const imgUrl = imgs.length > 1 ? imgs[1 + (i % (imgs.length - 1))] : imgs[0];
           return <VendorCard key={i} vendor={v} imageUrl={imgUrl} />;
         })}
       </ScrollView>
