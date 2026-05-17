@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const CATEGORIES = [
@@ -14,6 +14,47 @@ const CATEGORIES = [
   { id: "invitations", label: "Invitaciones",emoji: "💌" },
   { id: "planner",     label: "Planner",     emoji: "📋" },
 ];
+
+const CATEGORY_IMAGES: Record<string, string[]> = {
+  venue:       ["https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1464047736614-af63643285bf?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1519225421980-716433b7e5de?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1507504031003-b417219a0fde?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1478146059778-26028b07395a?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1510076857177-7470076d4098?w=600&h=240&fit=crop"],
+  catering:    ["https://images.unsplash.com/photo-1555244162-803834f70033?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600&h=240&fit=crop"],
+  photography: ["https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1519845081274-cf544b4cb74f?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&h=240&fit=crop"],
+  music:       ["https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&h=240&fit=crop"],
+  florist:     ["https://images.unsplash.com/photo-1490750967868-88df5691cc46?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1487530811015-780780616df2?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1453301109223-4a9f04e87419?w=600&h=240&fit=crop"],
+  cake:        ["https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1535254973040-607b474cb50d?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1522767131594-6a5e8599b9a7?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&h=240&fit=crop"],
+  transport:   ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1566008885218-90a4fc6780a3?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=600&h=240&fit=crop"],
+  beauty:      ["https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1560869713-da86bd23f438?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=240&fit=crop"],
+  invitations: ["https://images.unsplash.com/photo-1519655966628-3c7fe16e6b24?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&h=240&fit=crop"],
+  planner:     ["https://images.unsplash.com/photo-1543269664-647163ec1d7c?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=600&h=240&fit=crop",
+                "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=600&h=240&fit=crop"],
+};
 
 // Static vendor data (mirrors fake_data.py)
 const VENDORS: Record<string, any[]> = {
@@ -76,25 +117,34 @@ const VENDORS: Record<string, any[]> = {
   ],
 };
 
-function VendorCard({ vendor }: { vendor: any }) {
+function VendorCard({ vendor, imageUrl }: { vendor: any; imageUrl?: string }) {
   return (
     <View style={styles.card}>
-      <View style={styles.cardTop}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.vendorName}>{vendor.name}</Text>
-          <Text style={styles.vendorStyle}>{vendor.style}</Text>
+      {imageUrl && (
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.cardImage}
+          resizeMode="cover"
+        />
+      )}
+      <View style={styles.cardBody}>
+        <View style={styles.cardTop}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.vendorName}>{vendor.name}</Text>
+            <Text style={styles.vendorStyle}>{vendor.style}</Text>
+          </View>
+          <View style={{ alignItems: 'flex-end' }}>
+            <Text style={styles.rating}>⭐ {vendor.rating}</Text>
+            <Text style={styles.reviews}>{vendor.reviews} op.</Text>
+          </View>
         </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <Text style={styles.rating}>⭐ {vendor.rating}</Text>
-          <Text style={styles.reviews}>{vendor.reviews} op.</Text>
+        <Text style={styles.description}>{vendor.description}</Text>
+        <View style={styles.cardBottom}>
+          <Text style={styles.price}>{vendor.price_display}</Text>
+          {vendor.badge && <Text style={styles.badge}>{vendor.badge}</Text>}
         </View>
+        <Text style={styles.location}>📍 {vendor.location}</Text>
       </View>
-      <Text style={styles.description}>{vendor.description}</Text>
-      <View style={styles.cardBottom}>
-        <Text style={styles.price}>{vendor.price_display}</Text>
-        {vendor.badge && <Text style={styles.badge}>{vendor.badge}</Text>}
-      </View>
-      <Text style={styles.location}>📍 {vendor.location}</Text>
     </View>
   );
 }
@@ -103,9 +153,21 @@ export default function BrowseScreen() {
   const [activeCategory, setActiveCategory] = useState("venue");
   const vendors = VENDORS[activeCategory] || [];
 
+  const heroImg = (CATEGORY_IMAGES[activeCategory] || [])[0];
+
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Proveedores</Text>
+      {/* Hero banner */}
+      {heroImg && (
+        <View style={styles.hero}>
+          <Image source={{ uri: heroImg }} style={styles.heroImage} resizeMode="cover" />
+          <View style={styles.heroOverlay}>
+            <Text style={styles.heroEmoji}>{CATEGORIES.find(c => c.id === activeCategory)?.emoji}</Text>
+            <Text style={styles.heroTitle}>{CATEGORIES.find(c => c.id === activeCategory)?.label}</Text>
+          </View>
+        </View>
+      )}
+      {!heroImg && <Text style={styles.header}>Proveedores</Text>}
 
       {/* Category tabs */}
       <ScrollView
@@ -130,7 +192,11 @@ export default function BrowseScreen() {
 
       {/* Vendor list */}
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
-        {vendors.map((v, i) => <VendorCard key={i} vendor={v} />)}
+        {vendors.map((v, i) => {
+          const imgs = CATEGORY_IMAGES[activeCategory] || [];
+          const imgUrl = imgs[i % imgs.length];
+          return <VendorCard key={i} vendor={v} imageUrl={imgUrl} />;
+        })}
       </ScrollView>
     </View>
   );
@@ -139,6 +205,11 @@ export default function BrowseScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
   header: { fontSize: 22, fontWeight: "800", color: "#0f172a", paddingHorizontal: 16, paddingTop: 56, paddingBottom: 10 },
+  hero: { width: '100%', height: 180, position: 'relative' },
+  heroImage: { width: '100%', height: 180 },
+  heroOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, backgroundColor: 'rgba(0,0,0,0.38)' },
+  heroEmoji: { fontSize: 28, marginBottom: 2 },
+  heroTitle: { fontSize: 22, fontWeight: '800', color: '#ffffff' },
   tabScroll: { maxHeight: 56, flexGrow: 0 },
   tabContainer: { paddingHorizontal: 12, paddingBottom: 8, flexDirection: 'row' },
   tab: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, marginRight: 8, borderRadius: 20, backgroundColor: '#ffffff', borderWidth: 1, borderColor: '#e2e8f0' },
@@ -148,7 +219,9 @@ const styles = StyleSheet.create({
   tabLabelActive: { color: '#ffffff' },
   list: { flex: 1 },
   listContent: { padding: 12, paddingBottom: 32 },
-  card: { backgroundColor: '#ffffff', borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#e2e8f0', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 2 },
+  card: { backgroundColor: '#ffffff', borderRadius: 16, marginBottom: 14, borderWidth: 1, borderColor: '#e2e8f0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 3, overflow: 'hidden' },
+  cardImage: { width: '100%', height: 160 },
+  cardBody: { padding: 14 },
   cardTop: { flexDirection: 'row', marginBottom: 6 },
   vendorName: { fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 2 },
   vendorStyle: { fontSize: 12, color: '#64748b' },
