@@ -145,6 +145,28 @@ function CarCard({ card, onAddToPlan }: { card: any; onAddToPlan?: () => void })
   );
 }
 
+function ChecklistCard({ checklist }: { checklist: any }) {
+  return (
+    <View style={styles.card}>
+      <Text style={[styles.cardAirline, { marginBottom: 4 }]}>🗓️ {checklist.title}</Text>
+      <Text style={styles.cardSeats}>{checklist.location} · {checklist.guest_count} invitados</Text>
+      {(checklist.phases || []).map((phase: any, i: number) => (
+        <View key={i} style={{ marginTop: 10 }}>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#475569', marginBottom: 4 }}>
+            {phase.emoji} {phase.phase}
+          </Text>
+          {(phase.tasks || []).map((task: string, j: number) => (
+            <View key={j} style={{ flexDirection: 'row', marginBottom: 2 }}>
+              <Text style={{ fontSize: 12, color: '#94a3b8', marginRight: 6 }}>○</Text>
+              <Text style={{ fontSize: 12, color: '#475569', flex: 1 }}>{task}</Text>
+            </View>
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 function stripMarkdown(text: string): string {
   return text
     .replace(/\*\*(.+?)\*\*/g, '$1')
@@ -180,14 +202,19 @@ function MessageBubble({ message, conversationId, conversationTitle, domain }: {
           <Text style={isUser ? styles.userText : styles.agentText}>{displayText}</Text>
         </View>
       )}
-      {cards.length > 0 && (
+      {mode === 'checklist' && message.payload?.checklist && (
+        <View style={styles.cardsContainer}>
+          <ChecklistCard checklist={message.payload.checklist} />
+        </View>
+      )}
+      {cards.length > 0 && mode !== 'checklist' && (
         <View style={styles.cardsContainer}>
           {cards.map((card: any, i: number) => {
             const added = addedItems.has(i);
             if (mode === 'flight_results') return <FlightCard key={i} card={card} onAddToPlan={added ? undefined : () => handleAddToPlan(card, i, 'flight')} />;
             if (mode === 'hotel_results') return <HotelCard key={i} card={card} onAddToPlan={added ? undefined : () => handleAddToPlan(card, i, 'hotel')} />;
             if (mode === 'car_results') return <CarCard key={i} card={card} onAddToPlan={added ? undefined : () => handleAddToPlan(card, i, 'car')} />;
-            return <VendorCard key={i} card={card} />;
+            return <VendorCard key={i} card={card} onAddToPlan={added ? undefined : () => handleAddToPlan(card, i, 'vendor')} />;
           })}
         </View>
       )}

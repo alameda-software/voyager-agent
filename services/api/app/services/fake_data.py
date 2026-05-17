@@ -143,6 +143,120 @@ MUSIC = [
 ]
 
 
+# ── Florists ─────────────────────────────────────────────────────────────────
+FLORISTS = [
+    {"name": "Flores Sevilla · La Azalea", "type": "florist", "location": "Sevilla",
+     "style": "Romántico · Natural", "price_from": 800, "rating": 4.9, "reviews": 134,
+     "description": "Especialistas en bodas románticas. Arreglos florales y decoración completa."},
+    {"name": "Jardín Secreto Eventos", "type": "florist", "location": "Sevilla",
+     "style": "Boho · Silvestre", "price_from": 600, "rating": 4.8, "reviews": 89,
+     "description": "Estilo boho y silvestre. Flores de temporada y decoración de espacios."},
+    {"name": "Floristería Triana", "type": "florist", "location": "Triana, Sevilla",
+     "style": "Clásico · Elegante", "price_from": 500, "rating": 4.7, "reviews": 67,
+     "description": "Más de 20 años en el sector. Clásico andaluz con toque de elegancia."},
+    {"name": "La Espiga Dorada", "type": "florist", "location": "Sevilla",
+     "style": "Moderno · Minimalista", "price_from": 900, "rating": 4.9, "reviews": 112,
+     "description": "Diseño floral minimalista y contemporáneo. Premio mejor floristería 2024."},
+]
+
+# ── Wedding Cakes ─────────────────────────────────────────────────────────────
+CAKES = [
+    {"name": "Dulce Evento · Pastelería Nupcial", "type": "cake", "location": "Sevilla",
+     "style": "Artístico · A medida", "price_from": 350, "rating": 5.0, "reviews": 203,
+     "description": "Tartas nupciales de diseño único. Degustación gratuita incluida."},
+    {"name": "La Tarta de Ana", "type": "cake", "location": "Sevilla",
+     "style": "Fondant · Clásico", "price_from": 250, "rating": 4.9, "reviews": 178,
+     "description": "Especialistas en fondant y decoración artesanal. Más de 500 bodas."},
+    {"name": "Sugar & Dreams", "type": "cake", "location": "Sevilla",
+     "style": "Naked cake · Boho", "price_from": 280, "rating": 4.8, "reviews": 145,
+     "description": "Naked cakes y semi-naked con flores naturales. Muy instagrameable."},
+    {"name": "Pastelería Alfonso", "type": "cake", "location": "Sevilla",
+     "style": "Tradicional · Sabores únicos", "price_from": 200, "rating": 4.7, "reviews": 89,
+     "description": "Tradición sevillana desde 1978. Sabores únicos y precios accesibles."},
+]
+
+# ── Transport ─────────────────────────────────────────────────────────────────
+TRANSPORT = [
+    {"name": "Bodas en Rolls Royce Sevilla", "type": "transport", "location": "Sevilla",
+     "style": "Rolls Royce · Lujo", "price_from": 450, "rating": 5.0, "reviews": 89,
+     "description": "Rolls Royce Silver Shadow y Phantom. El toque de lujo para tu gran día."},
+    {"name": "Coche de Época Sevilla", "type": "transport", "location": "Sevilla",
+     "style": "Vintage · Época", "price_from": 300, "rating": 4.9, "reviews": 134,
+     "description": "Jaguar, Citroën DS, Mercedes clásico. Fotos espectaculares garantizadas."},
+    {"name": "Limusinas & Eventos SVQ", "type": "transport", "location": "Sevilla",
+     "style": "Limusina · Grupo", "price_from": 350, "rating": 4.7, "reviews": 67,
+     "description": "Limusinas para novia y grupo. Servicio de chófer y decoración incluida."},
+    {"name": "Autocares Boda Sevilla", "type": "transport", "location": "Sevilla",
+     "style": "Autobús invitados", "price_from": 280, "rating": 4.6, "reviews": 45,
+     "description": "Traslado de invitados en autobús. Puntual y con conductor de librea."},
+]
+
+# ── Makeup & Beauty ───────────────────────────────────────────────────────────
+BEAUTY = [
+    {"name": "Maquillaje Nupcial · Rocío García", "type": "beauty", "location": "Sevilla",
+     "style": "Natural · Airbrush", "price_from": 250, "rating": 5.0, "reviews": 312,
+     "description": "Maquillaje airbrush de larga duración. Prueba incluida. 500+ novias."},
+    {"name": "Estudio Novia Sevilla", "type": "beauty", "location": "Sevilla",
+     "style": "Makeup + Peluquería", "price_from": 350, "rating": 4.9, "reviews": 234,
+     "description": "Pack completo makeup + peinado. Para novia y séquito."},
+    {"name": "Glamour & Arte Nupcial", "type": "beauty", "location": "Sevilla",
+     "style": "Glam · Editorial", "price_from": 300, "rating": 4.8, "reviews": 167,
+     "description": "Estilo editorial y glamuroso. Especialistas en novias morenas."},
+]
+
+# ── Invitations & Stationery ──────────────────────────────────────────────────
+INVITATIONS = [
+    {"name": "Papel & Tinta Bodas", "type": "invitations", "location": "Sevilla",
+     "style": "Artesanal · Letterpress", "price_from": 180, "rating": 4.9, "reviews": 145,
+     "description": "Invitaciones letterpress artesanales. Diseño personalizado incluido."},
+    {"name": "Invitaciones Únicas SVQ", "type": "invitations", "location": "Sevilla",
+     "style": "Moderno · Minimalista", "price_from": 120, "rating": 4.8, "reviews": 89,
+     "description": "Diseños modernos y minimalistas. Entrega en 10 días laborables."},
+    {"name": "Detallería Nupcial", "type": "invitations", "location": "Sevilla",
+     "style": "Detalles + Invitaciones", "price_from": 200, "rating": 4.9, "reviews": 112,
+     "description": "Pack invitaciones + detalles para invitados. Diseño cohesionado."},
+]
+
+# ── Wedding Planners ──────────────────────────────────────────────────────────
+PLANNERS = [
+    {"name": "Bodas con Alma · Sevilla", "type": "planner", "location": "Sevilla",
+     "style": "Full planning · Coordinación", "price_from": 2500, "rating": 5.0, "reviews": 89,
+     "description": "Wedding planner full service. Desde el primer día hasta el gran día."},
+    {"name": "Eventos & Sueños", "type": "planner", "location": "Sevilla",
+     "style": "Day coordination", "price_from": 800, "rating": 4.9, "reviews": 134,
+     "description": "Coordinación del día de la boda. Para que disfrutéis sin preocupaciones."},
+    {"name": "The Wedding Studio Sevilla", "type": "planner", "location": "Sevilla",
+     "style": "Luxury · Destination weddings", "price_from": 3500, "rating": 4.9, "reviews": 67,
+     "description": "Especialistas en bodas de lujo y destination weddings en Andalucía."},
+]
+
+VENDOR_POOLS = {
+    "venue": VENUES,
+    "catering": CATERING,
+    "photography": PHOTOGRAPHERS,
+    "music": MUSIC,
+    "florist": FLORISTS,
+    "cake": CAKES,
+    "transport": TRANSPORT,
+    "beauty": BEAUTY,
+    "invitations": INVITATIONS,
+    "planner": PLANNERS,
+}
+
+VENDOR_ALIASES = {
+    "finca": "venue", "hacienda": "venue", "lugar": "venue", "espacio": "venue", "salon": "venue",
+    "banquete": "catering", "comida": "catering",
+    "foto": "photography", "fotografo": "photography", "fotografia": "photography", "video": "photography",
+    "dj": "music", "banda": "music", "grupo": "music", "musica": "music",
+    "flores": "florist", "florista": "florist", "decoracion": "florist",
+    "tarta": "cake", "pastel": "cake", "cake": "cake",
+    "coche": "transport", "autobus": "transport", "limusina": "transport", "transporte": "transport",
+    "maquillaje": "beauty", "peluqueria": "beauty", "belleza": "beauty", "makeup": "beauty",
+    "invitaciones": "invitations", "papeleria": "invitations", "detalles": "invitations",
+    "wedding planner": "planner", "organizador": "planner", "coordinador": "planner",
+}
+
+
 def _guess_iata(city: str) -> str:
     mapping = {
         "london": "LHR", "seville": "SVQ", "sevilla": "SVQ",
@@ -416,32 +530,33 @@ def search_car_rentals(location: str, pickup_date: str | None = None,
 
 def search_vendors(category: str = "all", location: str = "Seville",
                    guest_count: int = 100, budget: int | None = None) -> list[dict]:
-    cat = category.lower()
-    pools: list[list] = []
+    cat = category.lower().strip()
+    # Resolve alias
+    resolved = VENDOR_ALIASES.get(cat, cat)
 
-    if cat in ("all", "venue", "finca", "hacienda", "lugar", "espacio"):
-        pools.append(VENUES)
-    if cat in ("all", "catering", "banquete", "comida"):
-        pools.append(CATERING)
-    if cat in ("all", "photography", "foto", "fotografo", "fotografia", "video"):
-        pools.append(PHOTOGRAPHERS)
-    if cat in ("all", "music", "musica", "dj", "banda", "grupo"):
-        pools.append(MUSIC)
-
-    if not pools:
-        pools = [VENUES, CATERING, PHOTOGRAPHERS, MUSIC]
+    if resolved == "all" or cat == "all":
+        # Return 2 from each main category
+        selected_pools = [(k, v) for k, v in VENDOR_POOLS.items()]
+    else:
+        pool = VENDOR_POOLS.get(resolved)
+        if pool:
+            selected_pools = [(resolved, pool)]
+        else:
+            # Fuzzy match
+            selected_pools = [(k, v) for k, v in VENDOR_POOLS.items() if resolved in k or k in resolved]
+        if not selected_pools:
+            selected_pools = [(k, v) for k, v in VENDOR_POOLS.items()]
 
     results = []
-    for pool in pools:
-        # Filter by guest capacity for venues
+    for pool_name, pool in selected_pools:
         filtered = pool
-        if guest_count and pool is VENUES:
+        if guest_count and pool_name == "venue":
             filtered = [v for v in pool if v.get("capacity", 999) >= guest_count] or pool
 
-        sample = random.sample(filtered, min(3, len(filtered)))
+        n = 3 if len(selected_pools) == 1 else 2
+        sample = random.sample(filtered, min(n, len(filtered)))
         for v in sample:
             item = {**v, "vendor_type": v["type"]}
-            # Add price display
             if "price_per_head" in v:
                 item["price_display"] = f"Desde {v['price_per_head']}€/persona"
             elif "price_from" in v and v["price_from"] > 100:
