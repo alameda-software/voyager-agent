@@ -5,8 +5,12 @@ import re
 import unicodedata
 from functools import lru_cache
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from app.domains.wedding.categories import CATEGORY_ALIASES, CATEGORY_BY_ID, WEDDING_VENDOR_CATEGORIES
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 _DATA_PATH = Path(__file__).resolve().parent / "data" / "vendors.json"
 
@@ -32,15 +36,52 @@ def _normalize(text: str) -> str:
     return "".join(char for char in normalized if unicodedata.category(char) != "Mn")
 
 
-@lru_cache(maxsize=1)
-def load_vendors() -> list[dict]:
+async def load_vendors(db: AsyncSession | None = None) -> list[dict]:
+    """Load vendors from database or JSON file."""
+    if db:
+        try:
+            from app.models import Vendor
+            from sqlalchemy import select
+
+            result = await db.execute(select(Vendor))
+            vendors = result.scalars().all()
+            return [_vendor_to_dict(v) for v in vendors]
+        except Exception:
+            pass
+
+    # Fallback to JSON file
     if not _DATA_PATH.exists():
         return []
     payload = json.loads(_DATA_PATH.read_text(encoding="utf-8"))
     return list(payload.get("vendors", []))
 
 
-def list_categories() -> list[dict]:
+def _vendor_to_dict(vendor) -> dict:
+    """Convert Vendor ORM object to dictionary."""
+    return {
+        "id": vendor.id,
+        "name": vendor.name,
+        "category": vendor.category,
+        "category_label": vendor.category_label,
+        "city": vendor.city,
+        "region": vendor.region,
+        "rating": vendor.rating,
+        "review_count": vendor.review_count,
+        "price_from": vendor.price_from,
+        "price_label": vendor.price_label,
+        "short_description": vendor.short_description,
+        "tags": vendor.tags or [],
+        "capacity_min": vendor.capacity_min,
+        "capacity_max": vendor.capacity_max,
+        "featured": vendor.featured,
+        "promotion": vendor.promotion,
+        "availability_hint": vendor.availability_hint,
+        "image_url": vendor.image_url,
+    }
+
+
+async def list_categories(db: AsyncSession | None = None) -> list[dict]:
+    vendors = await load_vendors(db)
     return [
         {
             "id": item.id,
@@ -48,7 +89,7 @@ def list_categories() -> list[dict]:
             "description": item.description,
             "icon": item.icon,
             "bodas_path": item.bodas_path,
-            "vendor_count": sum(1 for vendor in load_vendors() if vendor["category"] == item.id),
+            "vendor_count": sum(1 for vendor in vendors if vendor["category"] == item.id),
         }
         for item in WEDDING_VENDOR_CATEGORIES
     ]
@@ -73,14 +114,75 @@ def detect_city(text: str) -> str | None:
     return None
 
 
-def search_vendors(
+def _load_vendors_sync() -> list[dict]:
+    """Synchronous vendor loading from JSON file."""
+    if not _DATA_PATH.exists():
+        return []
+    payload = json.loads(_DATA_PATH.read_text(encoding="utf-8"))
+    return list(payload.get("vendors", []))
+
+
+def search_vendors_sync(
     *,
     category: str | None = None,
     city: str | None = None,
     query: str | None = None,
     limit: int = 6,
 ) -> list[dict]:
-    vendors = load_vendors()
+    """Synchronous vendor search using JSON file."""
+    vendors = _load_vendors_sync()
+    normalized_query = _normalize(query) if query else ""
+
+    def matches(vendor: dict) -> bool:
+        if category and vendor["category"] != category:
+            return False
+        if city and _normalize(vendor["city"]) != _normalize(city):
+            return False
+        if not normalized_query:
+            return True
+        haystack = _normalize(
+            " ".join(
+                [
+                    vendor["name"],
+                    vendor.get("short_description", ""),
+                    vendor["city"],
+                    vendor.get("region", ""),
+                    " ".join(vendor.get("tags", [])),
+                    CATEGORY_BY_ID.get(vendor["category"], vendor["category"]).label
+                    if vendor["category"] in CATEGORY_BY_ID
+                    else vendor["category"],
+                ]
+            )
+        )
+        return normalized_query in haystack or any(
+            token in haystack for token in normalized_query.split() if len(token) > 2
+        )
+
+    filtered = [vendor for vendor in vendors if matches(vendor)]
+    filtered.sort(
+        key=lambda vendor: (
+            0 if vendor.get("featured") else 1,
+            -float(vendor.get("rating", 0)),
+            -int(vendor.get("review_count", 0)),
+        )
+    )
+    return [_vendor_card(vendor) for vendor in filtered[:limit]]
+
+
+async def search_vendors(
+    *,
+    category: str | None = None,
+    city: str | None = None,
+    query: str | None = None,
+    limit: int = 6,
+    db: AsyncSession | None = None,
+) -> list[dict]:
+    # Use async load if db provided, else use sync load
+    if db:
+        vendors = await load_vendors(db)
+    else:
+        vendors = _load_vendors_sync()
+
     normalized_query = _normalize(query) if query else ""
 
     def matches(vendor: dict) -> bool:
@@ -122,7 +224,7 @@ def search_vendors(
 def _vendor_card(vendor: dict) -> dict:
     category = CATEGORY_BY_ID.get(vendor["category"])
     return {
-        "id": vendor["id"],
+        "id": str(vendor["id"]),
         "name": vendor["name"],
         "category": vendor["category"],
         "category_label": category.label if category else vendor["category"],

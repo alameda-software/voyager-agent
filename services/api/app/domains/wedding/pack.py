@@ -181,7 +181,7 @@ class WeddingPack:
 
     def agent_reply(self, state: dict, history: list | None = None) -> DomainReply:
         from app.config import settings
-        from app.domains.wedding.inventory import search_vendors
+        from app.domains.wedding.inventory import search_vendors_sync
         from openai import OpenAI
 
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -209,7 +209,7 @@ class WeddingPack:
                     category = args.get("category")
                     if category == "all":
                         category = None
-                    cards = search_vendors(
+                    cards = search_vendors_sync(
                         category=category,
                         city=args.get("location", "Sevilla"),
                         limit=4,

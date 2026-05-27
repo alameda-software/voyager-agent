@@ -1,17 +1,19 @@
 from typing import Optional
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domains.wedding.inventory import list_categories, load_vendors, search_vendors
+from app.db.session import get_db
+from app.domains.wedding.inventory import list_categories, search_vendors
 from app.schemas.wedding import VendorCategoryRead, VendorSearchResponse
 
 router = APIRouter()
 
 
 @router.get("/categories", response_model=list[VendorCategoryRead])
-async def get_wedding_categories():
+async def get_wedding_categories(db: AsyncSession = Depends(get_db)):
     """Bodas.net-style vendor categories for the wedding MVP."""
-    return list_categories()
+    return await list_categories(db)
 
 
 @router.get("/vendors", response_model=VendorSearchResponse)
@@ -20,8 +22,9 @@ async def search_wedding_vendors(
     city: Optional[str] = Query(None, description="City name, e.g. Sevilla"),
     q: Optional[str] = Query(None, description="Free-text search"),
     limit: int = Query(12, ge=1, le=50),
+    db: AsyncSession = Depends(get_db),
 ):
-    results = search_vendors(category=category, city=city, query=q, limit=limit)
+    results = await search_vendors(category=category, city=city, query=q, limit=limit, db=db)
     return VendorSearchResponse(
         total=len(results),
         category=category,

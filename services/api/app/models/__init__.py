@@ -8,6 +8,7 @@ from app.models.concierge import (
     StructuredState,
 )
 from app.models.user import User
+from app.models.wedding import Vendor
 
 __all__ = [
     "ConciergeDomain",
@@ -18,4 +19,5 @@ __all__ = [
     "SavedRecommendation",
     "StructuredState",
     "User",
+    "Vendor",
 ]
