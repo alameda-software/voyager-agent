@@ -13,12 +13,10 @@ FUNCTIONS = [
                 "category": {
                     "type": "string",
                     "description": "Vendor category",
-                    "enum": ["all", "venue", "catering", "photography", "music",
-                             "florist", "cake", "transport", "beauty", "invitations", "planner"],
+                    "enum": ["all", "finca", "banquete", "fotografia", "video", "musica", "animacion",
+                             "decoracion", "floristeria", "cake", "wedding_planner", "coches", "belleza", "invitaciones"],
                 },
-                "location": {"type": "string"},
-                "guest_count": {"type": "integer"},
-                "budget": {"type": "integer"},
+                "location": {"type": "string", "description": "City name, e.g. Sevilla"},
             },
             "required": ["category"],
         },
@@ -60,23 +58,30 @@ FUNCTIONS = [
 
 SYSTEM_PROMPT = """You are a warm, experienced wedding planning concierge for Spain.
 You help couples plan their perfect wedding step by step — fully conversational and personalised.
+IMPORTANT: Respond in the SAME LANGUAGE the user writes in (Spanish if they write Spanish, English if they write English).
 
 Your job is to:
 1. Gather: location, date, guest count, budget, style/vibe
-2. Then work through each category the couple needs:
-   venue → catering → photography → music → florist → cake → transport → beauty → invitations → planner
-3. Search vendors when you know what category is needed
+2. Then work through each category the couple needs
+3. Search vendors IMMEDIATELY when you detect a category + location (don't ask for more context)
 4. Generate a planning checklist when you have enough info
 5. Confirm selections as they choose
 
-Rules:
-- Ask one thing at a time — don't overwhelm
-- When a category is discussed, call search_vendors with that specific category
-- When couple has date + guest count + location → offer to call generate_wedding_checklist
+CRITICAL RULES:
+- When user mentions a vendor CATEGORY (photographer, catering, venue, music, florist, etc) + LOCATION → CALL search_vendors RIGHT AWAY
+- Don't ask for more info first — search with what you have, then offer follow-ups
+- Example: "Need DJ in Seville" → search immediately for musica/Sevilla
+- Keep responses VERY SHORT: max 1-2 sentences, absolute max 3 lines
+- For clarifications: explain in 1-2 sentences max, then ask follow-up question
+- Always end with a clear ACTION: "Which appeals to you?" or "Want to see more options?"
+- DO NOT write long paragraphs or detailed explanations — be crisp and actionable
+- When couple has date + guest count + location → offer generate_wedding_checklist
 - When couple picks a vendor → call confirm_vendor
-- Be warm, celebratory, practical. Use Spanish wedding context naturally (hacienda, aperitivo, barra libre etc.)
-- NEVER list vendor results as text — the cards are shown visually
-- Keep replies to 1-2 sentences unless giving advice or the checklist"""
+- Be warm, celebratory, practical
+- Use natural context: Spanish couples get "vosotros", hacienda references. English couples get "you", garden references
+- NEVER list vendor results as text — the cards are shown visually by the app
+- Spanish couples: Use "vosotros", "Sevilla" context naturally
+- English couples: Use standard "you", UK/international context"""
 
 
 def _make_checklist(args: dict) -> dict:
@@ -176,7 +181,7 @@ class WeddingPack:
 
     def agent_reply(self, state: dict, history: list | None = None) -> DomainReply:
         from app.config import settings
-        from app.services.fake_data import search_vendors
+        from app.domains.wedding.inventory import search_vendors
         from openai import OpenAI
 
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -201,15 +206,17 @@ class WeddingPack:
                 args = json.loads(msg.function_call.arguments)
 
                 if fn == "search_vendors":
+                    category = args.get("category")
+                    if category == "all":
+                        category = None
                     cards = search_vendors(
-                        category=args.get("category", "all"),
-                        location=args.get("location", "Sevilla"),
-                        guest_count=args.get("guest_count", 100),
-                        budget=args.get("budget"),
+                        category=category,
+                        city=args.get("location", "Sevilla"),
+                        limit=4,
                     )
                     messages.append({"role": "assistant", "content": None,
                                      "function_call": {"name": fn, "arguments": msg.function_call.arguments}})
-                    messages.append({"role": "function", "name": fn, "content": json.dumps(cards[:4])})
+                    messages.append({"role": "function", "name": fn, "content": json.dumps(cards)})
                     follow_up = client.chat.completions.create(
                         model=settings.llm_model, messages=messages,
                         max_tokens=150, temperature=0.7,
@@ -218,7 +225,7 @@ class WeddingPack:
                     return DomainReply(
                         content=reply_text,
                         payload={"mode": "vendor_results", "domain": self.domain.value,
-                                 "category": args.get("category"), "cards": cards[:4]},
+                                 "category": args.get("category"), "cards": cards},
                     )
 
                 elif fn == "generate_wedding_checklist":

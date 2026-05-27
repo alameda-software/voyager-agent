@@ -261,7 +261,7 @@ EXPO_PUBLIC_API_URL=https://your-api-domain.com
 - Expo web export on a static host
 
 That is the lowest-friction deployment model for the current codebase.
-
+dog camera
 ## License
 
 Private.

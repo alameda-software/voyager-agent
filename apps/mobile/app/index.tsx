@@ -2,7 +2,9 @@ import { useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+
 import { createConversation } from "../src/api/client";
+import { MobileScreen } from "../src/components/MobileScreen";
 import type { ConciergeDomain } from "../src/types";
 
 const TEST_USER_ID = 1;
@@ -48,53 +50,57 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.logo}>✦ Concierge</Text>
-        <Text style={styles.title}>What are you planning?</Text>
-        <Text style={styles.subtitle}>Your AI assistant will guide you step by step.</Text>
-      </View>
+    <View style={styles.page}>
+      <MobileScreen padded={false} style={styles.column}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <Text style={styles.logo}>✦ Concierge</Text>
+            <Text style={styles.title}>What are you planning?</Text>
+            <Text style={styles.subtitle}>Your AI assistant will guide you step by step.</Text>
+          </View>
 
-      {/* Domain cards */}
-      <View style={styles.grid}>
-        {DOMAIN_OPTIONS.map((option) => {
-          const loading = activeDomain === option.domain;
-          return (
-            <TouchableOpacity
-              key={option.domain}
-              style={[styles.card, { borderColor: option.color + "33" }]}
-              onPress={() => handleStart(option.domain)}
-              disabled={activeDomain !== null}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.iconWrap, { backgroundColor: option.bg }]}>
-                {loading
-                  ? <ActivityIndicator color={option.color} size="small" />
-                  : <Ionicons name={option.icon} size={22} color={option.color} />
-                }
-              </View>
-              <View style={styles.cardText}>
-                <Text style={styles.cardTitle}>{option.title}</Text>
-                <Text style={styles.cardSubtitle}>{option.subtitle}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#cbd5e1" />
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+          <View style={styles.grid}>
+            {DOMAIN_OPTIONS.map((option) => {
+              const loading = activeDomain === option.domain;
+              return (
+                <TouchableOpacity
+                  key={option.domain}
+                  style={[styles.card, { borderColor: option.color + "33" }]}
+                  onPress={() => handleStart(option.domain)}
+                  disabled={activeDomain !== null}
+                  activeOpacity={0.85}
+                >
+                  <View style={[styles.iconWrap, { backgroundColor: option.bg }]}>
+                    {loading ? (
+                      <ActivityIndicator color={option.color} size="small" />
+                    ) : (
+                      <Ionicons name={option.icon} size={22} color={option.color} />
+                    )}
+                  </View>
+                  <View style={styles.cardText}>
+                    <Text style={styles.cardTitle}>{option.title}</Text>
+                    <Text style={styles.cardSubtitle}>{option.subtitle}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color="#cbd5e1" />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
 
-      {/* Recent hint */}
-      <Text style={styles.hint}>Tap a mode to start chatting with your AI concierge</Text>
-    </ScrollView>
+          <Text style={styles.hint}>Tap a mode to start chatting with your AI concierge</Text>
+        </ScrollView>
+      </MobileScreen>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: "#ffffff" },
+  column: { flex: 1 },
   scroll: { flex: 1, backgroundColor: "#ffffff" },
   container: {
     flexGrow: 1,
@@ -104,7 +110,14 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   header: { marginBottom: 28 },
-  logo: { fontSize: 13, fontWeight: "700", color: "#2563eb", letterSpacing: 1, marginBottom: 10, textTransform: "uppercase" },
+  logo: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#2563eb",
+    letterSpacing: 1,
+    marginBottom: 10,
+    textTransform: "uppercase",
+  },
   title: { fontSize: 26, fontWeight: "800", color: "#0f172a", lineHeight: 32, marginBottom: 8 },
   subtitle: { fontSize: 14, color: "#64748b", lineHeight: 20 },
   grid: { gap: 12 },

@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.v1.endpoints import chat, auth, search
+from app.api.v1.endpoints import auth, chat, search, wedding
 from app.db.base import Base
 from app.db.session import engine
 from app import models  # noqa: F401 - ensure all models are registered
@@ -55,6 +55,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["chat"])
 app.include_router(search.router, prefix="/api/v1/search", tags=["search"])
+app.include_router(wedding.router, prefix="/api/v1/wedding", tags=["wedding"])
 
 
 @app.get("/health")

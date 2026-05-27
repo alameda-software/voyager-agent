@@ -45,3 +45,13 @@ export const searchFlights = (params: Record<string, string>) =>
 
 export const searchHotels = (params: Record<string, string>) =>
   api.post("/api/v1/search/hotels", params);
+
+// Wedding vendors (Bodas.net-style MVP catalog)
+export const getWeddingCategories = () => api.get("/api/v1/wedding/categories");
+
+export const searchWeddingVendors = (params: {
+  category?: string;
+  city?: string;
+  q?: string;
+  limit?: number;
+}) => api.get("/api/v1/wedding/vendors", { params });

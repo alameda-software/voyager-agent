@@ -4,6 +4,8 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import { listConversations } from "../../src/api/client";
+import { MobileScreen } from "../../src/components/MobileScreen";
+import { colors } from "../../src/theme";
 import type { ConciergeDomain } from "../../src/types";
 
 const TEST_USER_ID = 1;
@@ -23,11 +25,11 @@ export default function ChatsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <MobileScreen padded={false} style={styles.screen}>
       <View style={styles.headerRow}>
         <Text style={styles.header}>Chats</Text>
         <TouchableOpacity style={styles.newChatBtn} onPress={() => router.push("/")}>
-          <Ionicons name="add" size={24} color="#6c63ff" />
+          <Ionicons name="add" size={26} color={colors.primary} />
         </TouchableOpacity>
       </View>
       <FlatList
@@ -47,10 +49,10 @@ export default function ChatsScreen() {
             <View style={styles.itemContent}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.preview} numberOfLines={1}>
-                {item.domain === "voyager" ? "Travel concierge session" : "Wedding concierge session"}
+                {item.domain === "voyager" ? "Travel concierge" : "Wedding concierge"}
               </Text>
             </View>
-            <Text style={styles.time}>{item.domain}</Text>
+            <Text style={styles.badge}>{item.domain}</Text>
           </TouchableOpacity>
         )}
         ListEmptyComponent={
@@ -60,34 +62,35 @@ export default function ChatsScreen() {
           </View>
         }
       />
-    </View>
+    </MobileScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0f0f23", paddingTop: 60 },
+  screen: { paddingTop: 56 },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    marginBottom: 12,
   },
-  header: { fontSize: 28, fontWeight: "700", color: "#fff" },
+  header: { fontSize: 26, fontWeight: "700", color: colors.text },
   newChatBtn: { padding: 4 },
   item: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#1a1a2e",
+    borderBottomColor: colors.border,
   },
-  emoji: { fontSize: 28, marginRight: 14 },
+  emoji: { fontSize: 26, marginRight: 12 },
   itemContent: { flex: 1 },
-  title: { fontSize: 16, fontWeight: "600", color: "#fff" },
-  preview: { fontSize: 14, color: "#888", marginTop: 4 },
-  time: { fontSize: 12, color: "#7dd3fc", textTransform: "capitalize" },
-  empty: { alignItems: "center", marginTop: 80 },
-  emptyText: { fontSize: 18, color: "#555" },
-  emptySub: { fontSize: 14, color: "#444", marginTop: 8 },
+  title: { fontSize: 16, fontWeight: "600", color: colors.text },
+  preview: { fontSize: 14, color: colors.textSecondary, marginTop: 3 },
+  badge: { fontSize: 11, color: colors.primary, textTransform: "capitalize", fontWeight: "600" },
+  empty: { alignItems: "center", marginTop: 60, paddingHorizontal: 16 },
+  emptyText: { fontSize: 17, color: colors.textSecondary },
+  emptySub: { fontSize: 14, color: colors.textMuted, marginTop: 8 },
 });

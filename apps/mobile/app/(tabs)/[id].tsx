@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -89,16 +90,28 @@ function FlightCard({ card, onAddToPlan }: { card: any; onAddToPlan?: () => void
 function VendorCard({ card }: { card: any }) {
   return (
     <View style={styles.card}>
+      {card.image_url && (
+        <Image
+          source={{ uri: card.image_url }}
+          style={styles.vendorCardImage}
+        />
+      )}
       <View style={styles.cardRow}>
-        <Text style={styles.cardAirline}>{card.name}</Text>
-        <Text style={styles.cardRating}>⭐ {card.rating}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cardAirline}>{card.name}</Text>
+          {card.short_description && <Text style={styles.cardStyle}>{card.short_description}</Text>}
+        </View>
+        {card.rating && <Text style={styles.cardRating}>⭐ {card.rating.toFixed(1)}</Text>}
       </View>
-      <Text style={styles.cardStyle}>{card.style}</Text>
       <Text style={styles.cardSeats}>
-        {card.price_per_head ? `Desde €${card.price_per_head}/persona` : card.price_from ? `Desde €${card.price_from}` : ''}
-        {card.reviews ? ` · ${card.reviews} opiniones` : ''}
-        {card.badge ? `  ${card.badge}` : ''}
+        {card.city && `${card.city}`}
+        {card.price_label ? ` · ${card.price_label}` : card.price_from ? ` · Desde €${card.price_from}` : ''}
+        {card.review_count ? ` · ${card.review_count} opiniones` : ''}
       </Text>
+      {card.tags && card.tags.length > 0 && (
+        <Text style={styles.cardStyle}>{card.tags.slice(0, 3).join(" · ")}</Text>
+      )}
+      {card.promotion && <Text style={styles.cardPromotion}>🎁 {card.promotion}</Text>}
     </View>
   );
 }
@@ -392,7 +405,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#ffffff",
     borderRadius: 12,
-    padding: 12,
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: "#e2e8f0",
     marginBottom: 8,
@@ -402,8 +415,13 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 2,
   },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 },
-  cardAirline: { fontSize: 14, fontWeight: "700", color: "#0f172a" },
+  vendorCardImage: {
+    width: "100%",
+    height: 160,
+    backgroundColor: "#f1f5f9",
+  },
+  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4, paddingHorizontal: 12, paddingTop: 12 },
+  cardAirline: { fontSize: 14, fontWeight: "700", color: "#0f172a", flex: 1 },
   cardPrice: { fontSize: 16, fontWeight: "800", color: "#2563eb" },
   cardPriceSub: { fontSize: 11, fontWeight: "400", color: "#64748b" },
   cardFlight: { alignItems: "flex-start" },
@@ -412,9 +430,10 @@ const styles = StyleSheet.create({
   cardIata: { fontSize: 11, color: "#64748b", marginTop: 1 },
   cardDuration: { fontSize: 11, color: "#64748b" },
   cardStops: { fontSize: 10, color: "#2563eb", fontWeight: "600", marginTop: 1 },
-  cardSeats: { fontSize: 11, color: "#94a3b8", marginTop: 3 },
-  cardStyle: { fontSize: 12, color: "#475569", marginBottom: 3 },
+  cardSeats: { fontSize: 11, color: "#94a3b8", marginTop: 3, paddingHorizontal: 12 },
+  cardStyle: { fontSize: 12, color: "#475569", marginBottom: 3, paddingHorizontal: 12 },
   cardRating: { fontSize: 13, fontWeight: "700", color: "#f59e0b" },
+  cardPromotion: { fontSize: 12, color: "#059669", fontWeight: "600", marginTop: 8, paddingHorizontal: 12, paddingBottom: 12 },
 
   // Flight card
   flightCard: {

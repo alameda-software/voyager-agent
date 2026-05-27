@@ -23,15 +23,50 @@ export interface Message {
   createdAt: string;
 }
 
+export interface WeddingVendorCard {
+  id: string;
+  name: string;
+  category: string;
+  category_label: string;
+  city: string;
+  region?: string | null;
+  rating?: number | null;
+  review_count?: number | null;
+  price_from?: number | null;
+  price_label?: string | null;
+  short_description?: string | null;
+  tags?: string[];
+  capacity_min?: number | null;
+  capacity_max?: number | null;
+  featured?: boolean;
+  promotion?: string | null;
+  availability_hint?: string | null;
+  image_url?: string | null;
+}
+
+export interface WeddingVendorCategory {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+  bodas_path: string;
+  vendor_count: number;
+}
+
 export interface MessagePayload {
   mode?: string;
   domain?: ConciergeDomain;
   suggested_actions?: string[];
-  type?: "text" | "flight_card" | "hotel_card" | "car_card" | "tour_card" | "quick_replies";
+  type?: "text" | "flight_card" | "hotel_card" | "car_card" | "tour_card" | "vendor_cards" | "quick_replies";
   options?: string[];
-  data?: Record<string, unknown>;
-  cards?: any[];
-  [key: string]: any;
+  data?: Record<string, unknown> & {
+    vendors?: WeddingVendorCard[];
+    filters?: { category?: string | null; city?: string | null };
+  };
+  cards?: Record<string, unknown>[];
+  category?: string;
+  checklist?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface StructuredState {
