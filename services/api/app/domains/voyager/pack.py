@@ -5,7 +5,31 @@ import json
 from app.domains.base import DomainReply
 from app.models import ConciergeDomain
 
-FUNCTIONS = [
+ADD_TO_PLAN_FUNCTION = {
+    "name": "add_to_plan",
+    "description": "Add the most recently shown results to the user's trip plan. Call this when the user says things like 'add to plan', 'add that', 'añade eso', 'añadir al plan', 'quiero ese', 'me quedo con ese'.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "item_type": {
+                "type": "string",
+                "enum": ["flight", "hotel", "car", "vendor"],
+                "description": "Type of item to add"
+            },
+            "item_index": {
+                "type": "integer",
+                "description": "0-based index of the specific item (0 = first, 1 = second etc). Use -1 to add all."
+            },
+            "item_name": {
+                "type": "string",
+                "description": "Name or description of the item being added, for confirmation message"
+            }
+        },
+        "required": ["item_type", "item_name"]
+    }
+}
+
+FUNCTIONS = [ADD_TO_PLAN_FUNCTION,
     {
         "name": "search_flights",
         "description": "Search flights when you have origin, destination, and approximate dates. Only call this once unless the user asks to search again.",
@@ -77,6 +101,7 @@ Rules:
 - After showing flights, ask if they need hotels or a car
 - Call search_hotels or search_car_rentals when needed
 - When the user says they want to SELECT or BOOK a specific option (e.g. "I'll take the easyJet", "book the Volotea", "I want that hotel") → call confirm_booking
+- When the user says "add to plan", "añade al plan", "add that", "añade eso", "me quedo con ese" → call add_to_plan with the item name
 - After confirming a booking, congratulate them and ask what else they need
 - Be warm, concise. Max 2 sentences unless showing options.
 - NEVER re-list search results as text — the cards are shown visually."""
@@ -163,6 +188,16 @@ class VoyagerPack:
                         content=reply_text,
                         payload={"mode": "booking_confirmed", "domain": self.domain.value,
                                  "booking": args},
+                    )
+                elif fn == "add_to_plan":
+                    item_name = args.get("item_name", "the item")
+                    item_index = args.get("item_index", -1)
+                    item_type = args.get("item_type", "flight")
+                    reply_text = f"✅ Añadido al plan: **{item_name}**. ¿Qué más necesitas para tu viaje?"
+                    return DomainReply(
+                        content=reply_text,
+                        payload={"mode": "add_to_plan", "domain": self.domain.value,
+                                 "item_type": item_type, "item_index": item_index, "item_name": item_name},
                     )
                 else:
                     cards, mode = [], "llm"

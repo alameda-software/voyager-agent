@@ -87,7 +87,7 @@ function FlightCard({ card, onAddToPlan }: { card: any; onAddToPlan?: () => void
   );
 }
 
-function VendorCard({ card }: { card: any }) {
+function VendorCard({ card, onAddToPlan }: { card: any; onAddToPlan?: () => void }) {
   return (
     <View style={styles.card}>
       {card.image_url && (
@@ -112,6 +112,7 @@ function VendorCard({ card }: { card: any }) {
         <Text style={styles.cardStyle}>{card.tags.slice(0, 3).join(" · ")}</Text>
       )}
       {card.promotion && <Text style={styles.cardPromotion}>🎁 {card.promotion}</Text>}
+      {onAddToPlan && <AddToPlanButton onPress={onAddToPlan} />}
     </View>
   );
 }
@@ -200,10 +201,29 @@ function MessageBubble({ message, conversationId, conversationTitle, domain }: {
   const mode = message.payload?.mode;
   const hasCards = cards.length > 0;
   const [addedItems, setAddedItems] = useState<Set<number>>(new Set());
+  const [allAdded, setAllAdded] = useState(false);
+
+  const typeForMode = (m: string | undefined): 'flight' | 'hotel' | 'car' | 'vendor' => {
+    if (m === 'flight_results') return 'flight';
+    if (m === 'hotel_results') return 'hotel';
+    if (m === 'car_results') return 'car';
+    return 'vendor';
+  };
 
   const handleAddToPlan = (card: any, index: number, type: 'flight' | 'hotel' | 'car' | 'vendor') => {
     addItemToPlan(conversationId, conversationTitle, domain as any, { type, data: card });
     setAddedItems(prev => new Set([...prev, index]));
+  };
+
+  const handleAddAll = () => {
+    const type = typeForMode(mode);
+    cards.forEach((card: any, i: number) => {
+      if (!addedItems.has(i)) {
+        addItemToPlan(conversationId, conversationTitle, domain as any, { type, data: card });
+      }
+    });
+    setAddedItems(new Set(cards.map((_: any, i: number) => i)));
+    setAllAdded(true);
   };
 
   const displayText = hasCards ? stripMarkdown(message.content) : message.content;
@@ -222,6 +242,16 @@ function MessageBubble({ message, conversationId, conversationTitle, domain }: {
       )}
       {cards.length > 0 && mode !== 'checklist' && (
         <View style={styles.cardsContainer}>
+          {/* Add all button */}
+          <TouchableOpacity
+            style={[styles.addAllBtn, allAdded && styles.addAllBtnDone]}
+            onPress={handleAddAll}
+            disabled={allAdded}
+          >
+            <Text style={[styles.addAllBtnText, allAdded && styles.addAllBtnTextDone]}>
+              {allAdded ? '✓ Todos en el plan' : '+ Añadir todos al plan'}
+            </Text>
+          </TouchableOpacity>
           {cards.map((card: any, i: number) => {
             const added = addedItems.has(i);
             if (mode === 'flight_results') return <FlightCard key={i} card={card} onAddToPlan={added ? undefined : () => handleAddToPlan(card, i, 'flight')} />;
@@ -273,7 +303,22 @@ export default function ChatScreen() {
       const response = await sendMessage(Number(id), input.trim());
       setInput("");
       setState(response.data.structured_state);
-      // Reload from server to get canonical state (avoids duplicates)
+      // If AI responded with add_to_plan, auto-add last cards to plan
+      const payload = response.data.message?.payload;
+      if (payload?.mode === 'add_to_plan') {
+        // Find last message with cards and add them
+        const lastCardsMsg = [...messages].reverse().find(m => m.payload?.cards?.length);
+        if (lastCardsMsg?.payload?.cards) {
+          const cards = lastCardsMsg.payload.cards;
+          const itemType = (payload.item_type || 'vendor') as any;
+          const idx = payload.item_index ?? -1;
+          if (idx === -1) {
+            cards.forEach((card: any) => addItemToPlan(Number(id), title || '', domain as any, { type: itemType, data: card }));
+          } else if (cards[idx]) {
+            addItemToPlan(Number(id), title || '', domain as any, { type: itemType, data: cards[idx] });
+          }
+        }
+      }
       await loadConversation(Number(id));
     } finally {
       setIsSending(false);
@@ -477,9 +522,17 @@ const styles = StyleSheet.create({
   addPlanBtn: {
     marginTop: 10, paddingVertical: 8, borderRadius: 10,
     backgroundColor: '#eff6ff', borderWidth: 1, borderColor: '#bfdbfe',
-    alignItems: 'center',
+    alignItems: 'center', marginHorizontal: 12, marginBottom: 10,
   },
   addPlanBtnDone: { backgroundColor: '#f0fdf4', borderColor: '#86efac' },
   addPlanBtnText: { fontSize: 13, fontWeight: '700', color: '#2563eb' },
   addPlanBtnTextDone: { color: '#16a34a' },
+  addAllBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 10, borderRadius: 12, marginBottom: 10,
+    backgroundColor: '#2563eb',
+  },
+  addAllBtnDone: { backgroundColor: '#dcfce7' },
+  addAllBtnText: { fontSize: 13, fontWeight: '800', color: '#ffffff' },
+  addAllBtnTextDone: { color: '#16a34a' },
 });

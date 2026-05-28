@@ -3,7 +3,21 @@ import json
 from app.domains.base import DomainReply
 from app.models import ConciergeDomain
 
-FUNCTIONS = [
+ADD_TO_PLAN_FUNCTION = {
+    "name": "add_to_plan",
+    "description": "Add a vendor to the user's wedding plan. Call when user says 'add to plan', 'añade ese', 'me lo quedo', 'quiero ese proveedor'.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "item_type": {"type": "string", "enum": ["vendor"]},
+            "item_index": {"type": "integer", "description": "0-based index, -1 = all"},
+            "item_name": {"type": "string"}
+        },
+        "required": ["item_type", "item_name"]
+    }
+}
+
+FUNCTIONS = [ADD_TO_PLAN_FUNCTION,
     {
         "name": "search_vendors",
         "description": "Search wedding vendors. Call this when you know the category needed and location.",
@@ -243,6 +257,15 @@ class WeddingPack:
                         payload={"mode": "checklist", "domain": self.domain.value, "checklist": checklist},
                     )
 
+                elif fn == "add_to_plan":
+                    item_name = args.get("item_name", "el proveedor")
+                    item_index = args.get("item_index", -1)
+                    reply_text = f"✅ Añadido al plan: **{item_name}**. ¿Qué más necesitas para tu boda?"
+                    return DomainReply(
+                        content=reply_text,
+                        payload={"mode": "add_to_plan", "domain": self.domain.value,
+                                 "item_type": "vendor", "item_index": item_index, "item_name": item_name},
+                    )
                 elif fn == "confirm_vendor":
                     name = args.get("vendor_name", "el proveedor")
                     vtype = args.get("vendor_type", "")
