@@ -12,29 +12,51 @@ from app import models  # noqa: F401 - ensure all models are registered
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create/migrate all tables
+    # Create/migrate all tables using raw asyncpg for DDL reliability
     try:
-        from sqlalchemy import text
-        async with engine.begin() as conn:
-            # Create all tables from models
-            await conn.run_sync(Base.metadata.create_all)
-            # Idempotent column additions for existing tables
-            patch_sqls = [
+        from app.config import settings
+        import asyncpg
+        # Use plain asyncpg for DDL (most reliable for ALTER TABLE)
+        raw_url = settings.database_url.replace("postgresql+asyncpg://", "postgresql://")
+        conn = await asyncpg.connect(raw_url)
+        try:
+            for sql in [
+                """CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    email VARCHAR(255) UNIQUE NOT NULL,
+                    hashed_password TEXT NOT NULL,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    display_name VARCHAR(255),
+                    role VARCHAR(50) NOT NULL DEFAULT 'user',
+                    partner_name VARCHAR(255),
+                    wedding_date VARCHAR(50),
+                    city VARCHAR(255),
+                    budget INTEGER
+                )""",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) NOT NULL DEFAULT 'user'",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS partner_name VARCHAR(255)",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS wedding_date VARCHAR(50)",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(255)",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS budget INTEGER",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name VARCHAR(255)",
-            ]
-            for sql in patch_sqls:
+            ]:
                 try:
-                    await conn.execute(text(sql))
-                except Exception:
-                    pass  # column already exists
-        print("DB schema OK")
+                    await conn.execute(sql)
+                except Exception as ex:
+                    print(f"DDL skip: {ex}")
+        finally:
+            await conn.close()
+        print("DB users table OK")
     except Exception as e:
-        print("DB init error:", e)
+        print("DB raw DDL error:", e)
+
+    # Create all other tables via SQLAlchemy
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("DB create_all OK")
+    except Exception as e:
+        print("DB create_all error:", e)
 
     # Seed wedding vendors if table is empty
     try:
