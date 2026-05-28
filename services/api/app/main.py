@@ -12,13 +12,20 @@ from app import models  # noqa: F401 - ensure all models are registered
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create all DB tables on startup
+    # Run Alembic migrations on startup (creates + migrates all tables)
     try:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        print("DB tables created/verified OK")
+        import subprocess, sys
+        result = subprocess.run(
+            [sys.executable, "-m", "alembic", "upgrade", "head"],
+            capture_output=True, text=True, cwd="/app"
+        )
+        print("Alembic stdout:", result.stdout.strip())
+        if result.returncode != 0:
+            print("Alembic stderr:", result.stderr.strip())
+        else:
+            print("DB migrations OK")
     except Exception as e:
-        print("DB init error:", e)
+        print("DB migration error:", e)
 
     # Seed wedding vendors if table is empty
     try:
