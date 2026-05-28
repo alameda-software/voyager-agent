@@ -19,6 +19,33 @@ async def lifespan(app: FastAPI):
         print("DB tables created/verified OK")
     except Exception as e:
         print("DB init error:", e)
+
+    # Seed wedding vendors if table is empty
+    try:
+        from sqlalchemy import text, select, func
+        from app.models.wedding import Vendor
+        from app.db.session import AsyncSessionLocal
+        import json
+        from pathlib import Path
+
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(select(func.count()).select_from(Vendor))
+            count = result.scalar()
+            if count == 0:
+                vendors_path = Path(__file__).parent / "domains" / "wedding" / "data" / "vendors.json"
+                if vendors_path.exists():
+                    data = json.loads(vendors_path.read_text(encoding="utf-8"))
+                    vendors_data = data.get("vendors", [])
+                    for vd in vendors_data:
+                        vd.pop("id", None)  # Let DB assign IDs
+                        session.add(Vendor(**vd))
+                    await session.commit()
+                    print(f"Seeded {len(vendors_data)} wedding vendors")
+            else:
+                print(f"Wedding vendors already seeded ({count} rows)")
+    except Exception as e:
+        print("Wedding vendor seed error:", e)
+
     yield
 
 

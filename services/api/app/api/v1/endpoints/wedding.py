@@ -35,14 +35,15 @@ async def search_wedding_vendors(
 
 
 @router.get("/vendors/stats")
-async def wedding_vendor_stats():
-    vendors = load_vendors()
-    cities = sorted({vendor["city"] for vendor in vendors})
-    categories = list_categories()
+async def wedding_vendor_stats(db: AsyncSession = Depends(get_db)):
+    from app.domains.wedding.inventory import load_vendors
+    vendors = await load_vendors(db)
+    cities = sorted({v["city"] for v in vendors})
+    categories = await list_categories(db)
     return {
         "vendor_count": len(vendors),
         "cities": cities,
-        "categories": categories,
+        "categories": [c.id for c in categories],
         "source_note": (
             "MVP catalog inspired by bodas.net/proveedores. "
             "Live scraping is blocked (403); regenerate with scripts/generate_bodas_vendor_seed.py"
