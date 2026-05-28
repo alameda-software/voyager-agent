@@ -46,6 +46,40 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print("Wedding vendor seed error:", e)
 
+    # Seed test users
+    try:
+        from sqlalchemy import select
+        from app.models.user import User
+        from app.db.session import AsyncSessionLocal
+        from app.api.v1.endpoints.auth import hash_password
+
+        TEST_USERS = [
+            {"email": "fer@g.com", "password": "123456", "display_name": "Fernando", "role": "superadmin"},
+            {"email": "vendor@g.com", "password": "123456", "display_name": "Vendor Demo", "role": "vendor"},
+            {"email": "user@g.com", "password": "123456", "display_name": "Caterina & Francisco", "role": "user",
+             "partner_name": "Francisco", "wedding_date": "2027-06-15", "city": "Sevilla"},
+        ]
+
+        async with AsyncSessionLocal() as session:
+            for u in TEST_USERS:
+                result = await session.execute(select(User).where(User.email == u["email"]))
+                if not result.scalar_one_or_none():
+                    user = User(
+                        email=u["email"],
+                        hashed_password=hash_password(u["password"]),
+                        display_name=u.get("display_name"),
+                        role=u["role"],
+                        partner_name=u.get("partner_name"),
+                        wedding_date=u.get("wedding_date"),
+                        city=u.get("city"),
+                        is_active=True,
+                    )
+                    session.add(user)
+            await session.commit()
+            print("Test users seeded OK")
+    except Exception as e:
+        print("Test user seed error:", e)
+
     yield
 
 
