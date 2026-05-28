@@ -44,8 +44,8 @@ function PlanItemRow({ item, planId, onUpdate }: { item: PlanItem; planId: strin
     price = `€${d.price_per_day}/día`;
   } else if (item.type === 'vendor') {
     title = d.name;
-    subtitle = d.style || d.vendor_type;
-    price = d.price_display || '';
+    subtitle = d.style || d.short_description || d.category_label || d.vendor_type || '';
+    price = d.price_display || d.price_label || (d.price_from ? `Desde €${d.price_from}` : '');
   }
 
   const handleReserve = () => {
@@ -102,13 +102,17 @@ function PlanItemRow({ item, planId, onUpdate }: { item: PlanItem; planId: strin
 
 function PlanCard({ plan, onUpdate }: { plan: TripPlan; onUpdate: () => void }) {
   const { flights, hotels, cars, vendors, totalEstimate } = getPlanSummary(plan);
+  const isWedding = plan.domain === 'wedding';
 
   return (
     <View style={styles.planCard}>
       <View style={styles.planCardHeader}>
-        <Text style={styles.planCardTitle}>{plan.domain === 'voyager' ? '✈️' : '💍'} {plan.title}</Text>
-        {totalEstimate > 0 && (
-          <Text style={styles.planCardEstimate}>~€{totalEstimate}/día est.</Text>
+        <Text style={styles.planCardTitle}>{isWedding ? '💍' : '✈️'} {plan.title}</Text>
+        {totalEstimate > 0 && !isWedding && (
+          <Text style={styles.planCardEstimate}>~€{totalEstimate} est.</Text>
+        )}
+        {isWedding && vendors.length > 0 && (
+          <Text style={styles.planCardEstimate}>{vendors.length} proveedor{vendors.length !== 1 ? 'es' : ''}</Text>
         )}
       </View>
 
@@ -130,12 +134,54 @@ function PlanCard({ plan, onUpdate }: { plan: TripPlan; onUpdate: () => void }) 
           {cars.map(item => <PlanItemRow key={item.id} item={item} planId={plan.id} onUpdate={onUpdate} />)}
         </View>
       )}
-      {vendors.length > 0 && (
+      {vendors.length > 0 && plan.domain === 'voyager' && (
         <View style={styles.section}>
           <SectionHeader icon="💍" title="Proveedores" count={vendors.length} />
           {vendors.map(item => <PlanItemRow key={item.id} item={item} planId={plan.id} onUpdate={onUpdate} />)}
         </View>
       )}
+      {vendors.length > 0 && plan.domain === 'wedding' && (() => {
+        // Group vendors by category for wedding
+        const CATEGORY_META: Record<string, { icon: string; label: string }> = {
+          finca: { icon: '🏛️', label: 'Venue' },
+          venue: { icon: '🏛️', label: 'Venue' },
+          banquete: { icon: '🍽️', label: 'Catering' },
+          catering: { icon: '🍽️', label: 'Catering' },
+          fotografia: { icon: '📸', label: 'Fotografía' },
+          photography: { icon: '📸', label: 'Fotografía' },
+          video: { icon: '🎥', label: 'Vídeo' },
+          musica: { icon: '🎵', label: 'Música' },
+          music: { icon: '🎵', label: 'Música' },
+          floristeria: { icon: '💐', label: 'Flores' },
+          florist: { icon: '💐', label: 'Flores' },
+          cake: { icon: '🎂', label: 'Tarta' },
+          coches: { icon: '🚗', label: 'Transporte' },
+          transport: { icon: '🚗', label: 'Transporte' },
+          belleza: { icon: '💄', label: 'Belleza' },
+          beauty: { icon: '💄', label: 'Belleza' },
+          invitaciones: { icon: '💌', label: 'Invitaciones' },
+          invitations: { icon: '💌', label: 'Invitaciones' },
+          wedding_planner: { icon: '📋', label: 'Planner' },
+          planner: { icon: '📋', label: 'Planner' },
+          animacion: { icon: '🎉', label: 'Animación' },
+          decoracion: { icon: '✨', label: 'Decoración' },
+        };
+        const grouped: Record<string, PlanItem[]> = {};
+        vendors.forEach(item => {
+          const cat = item.data?.category || item.data?.vendor_type || item.data?.type || 'otros';
+          if (!grouped[cat]) grouped[cat] = [];
+          grouped[cat].push(item);
+        });
+        return Object.entries(grouped).map(([cat, items]) => {
+          const meta = CATEGORY_META[cat] || { icon: '💍', label: cat };
+          return (
+            <View key={cat} style={styles.section}>
+              <SectionHeader icon={meta.icon} title={meta.label} count={items.length} />
+              {items.map(item => <PlanItemRow key={item.id} item={item} planId={plan.id} onUpdate={onUpdate} />)}
+            </View>
+          );
+        });
+      })()}
 
       {flights.length === 0 && hotels.length === 0 && cars.length === 0 && vendors.length === 0 && (
         <Text style={styles.emptyPlan}>Añade opciones desde el chat con "+ Añadir al plan"</Text>
