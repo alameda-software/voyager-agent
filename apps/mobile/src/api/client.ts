@@ -7,7 +7,36 @@ import type {
   SendMessageResponse,
 } from "../types";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+// Auto-detect API URL based on environment
+let API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+// If not explicitly set, detect from runtime environment
+if (!API_URL || API_URL === "undefined") {
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+
+    // For development
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      API_URL = "http://localhost:8000";
+    }
+    // For production at leafgate.es domain
+    else if (hostname.includes("leafgate.es")) {
+      API_URL = `${protocol}//api.leafgate.es`;
+    }
+    // Default: same domain, port 8000
+    else {
+      API_URL = `${protocol}//${hostname}:8000`;
+    }
+  } else {
+    API_URL = "http://localhost:8000";
+  }
+}
+
+// Final fallback
+if (!API_URL || API_URL === "undefined") {
+  API_URL = "http://localhost:8000";
+}
 
 export const api = axios.create({
   baseURL: API_URL,
