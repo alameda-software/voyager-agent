@@ -8,10 +8,10 @@ import type {
 } from "../types";
 
 // Auto-detect API URL based on environment
-let API_URL = process.env.EXPO_PUBLIC_API_URL;
+let API_URL = process.env.EXPO_PUBLIC_API_URL?.trim() || "";
 
 // If not explicitly set, detect from runtime environment
-if (!API_URL || API_URL === "undefined") {
+if (!API_URL || API_URL === "undefined" || API_URL === "localhost") {
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
