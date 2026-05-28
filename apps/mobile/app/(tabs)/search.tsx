@@ -6,7 +6,7 @@ import { getPlans, setPreferred, removeItem, getPlanSummary, type TripPlan, type
 function clearAllPlans() {
   try {
     if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('trip_plans');
+      localStorage.removeItem('voyager_trip_plans');
     }
   } catch {}
 }
