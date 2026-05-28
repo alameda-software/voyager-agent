@@ -92,9 +92,10 @@ async def lifespan(app: FastAPI):
         from app.api.v1.endpoints.auth import hash_password
 
         TEST_USERS = [
+            {"email": "fer@gmail.com", "password": "123456", "display_name": "Fernando", "role": "superadmin"},
             {"email": "fer@g.com", "password": "123456", "display_name": "Fernando", "role": "superadmin"},
-            {"email": "vendor@g.com", "password": "123456", "display_name": "Vendor Demo", "role": "vendor"},
-            {"email": "user@g.com", "password": "123456", "display_name": "Caterina & Francisco", "role": "user",
+            {"email": "vendor@livegate.es", "password": "123456", "display_name": "Vendor Demo", "role": "vendor"},
+            {"email": "demo@livegate.es", "password": "123456", "display_name": "Caterina & Francisco", "role": "user",
              "partner_name": "Francisco", "wedding_date": "2027-06-15", "city": "Sevilla"},
         ]
 

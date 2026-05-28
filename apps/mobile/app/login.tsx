@@ -35,7 +35,14 @@ export default function LoginScreen() {
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Error desconocido');
+      if (!res.ok) {
+        // FastAPI 422 returns detail as array [{loc, msg, type}]
+        const detail = data.detail;
+        if (Array.isArray(detail)) {
+          throw new Error(detail.map((e: any) => e.msg).join(', '));
+        }
+        throw new Error(detail || 'Error desconocido');
+      }
 
       saveAuth(data.token, data.user);
       router.replace('/(tabs)');
@@ -97,8 +104,8 @@ export default function LoginScreen() {
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
+              keyboardType="default"
+              autoCorrect={false}
             />
           </View>
 
