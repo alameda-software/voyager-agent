@@ -19,7 +19,7 @@
 ## 💡 Feature Ideas
 
 ### Tier 1: High Priority
-- 
+- **Email relay por pareja** — cada pareja recibe un alias `nombre@livegate.es` que reenvía a su Gmail personal. Los vendors nunca ven el email real. La app muestra el hilo de comunicación por vendor. AI redacta respuestas, la pareja aprueba con un tap.
 - 
 - 
 
@@ -37,8 +37,9 @@
 
 ## 🔧 Technical Ideas
 
-- 
-- 
+- **Email relay stack**: Resend.com (envío) + MX records en `livegate.es` + webhook inbound para recibir. ~1 día de implementación.
+- **Alias pattern**: `{nombre1}.{nombre2}@livegate.es` → forward a Gmail real de la pareja. Alias creados automáticamente al registrarse.
+- **AI email actions**: AI lee respuesta del vendor → redacta reply → pareja aprueba con tap → enviado desde alias livegate.
 - 
 
 ---
