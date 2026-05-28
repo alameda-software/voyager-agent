@@ -106,6 +106,8 @@ export default function LoginScreen() {
               autoCapitalize="none"
               keyboardType="default"
               autoCorrect={false}
+              // @ts-ignore — force text type on web to bypass browser email validation
+              type="text"
             />
           </View>
 
