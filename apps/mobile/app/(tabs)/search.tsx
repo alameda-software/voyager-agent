@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getPlans, setPreferred, removeItem, getPlanSummary, type TripPlan, type PlanItem } from "../../src/store/plan";
 
@@ -17,6 +17,7 @@ function SectionHeader({ icon, title, count }: { icon: string; title: string; co
 
 function PlanItemRow({ item, planId, onUpdate }: { item: PlanItem; planId: string; onUpdate: () => void }) {
   const d = item.data;
+  const [reserved, setReserved] = useState(item.reserved || false);
   let title = '';
   let subtitle = '';
   let price = '';
@@ -39,8 +40,30 @@ function PlanItemRow({ item, planId, onUpdate }: { item: PlanItem; planId: strin
     price = d.price_display || '';
   }
 
+  const handleReserve = () => {
+    Alert.alert(
+      reserved ? '✅ Ya reservado' : `Reservar ${title}`,
+      reserved
+        ? 'Este elemento ya está marcado como reservado.'
+        : `¿Confirmar reserva de ${title} por ${price}?`,
+      reserved
+        ? [{ text: 'OK' }]
+        : [
+            { text: 'Cancelar', style: 'cancel' },
+            {
+              text: '✅ Reservar',
+              onPress: () => {
+                setReserved(true);
+                setPreferred(planId, item.id);
+                onUpdate();
+              },
+            },
+          ]
+    );
+  };
+
   return (
-    <View style={[styles.itemRow, item.preferred && styles.itemRowPreferred]}>
+    <View style={[styles.itemRow, item.preferred && styles.itemRowPreferred, reserved && styles.itemRowReserved]}>
       <TouchableOpacity
         style={styles.starBtn}
         onPress={() => { setPreferred(planId, item.id); onUpdate(); }}
@@ -50,10 +73,18 @@ function PlanItemRow({ item, planId, onUpdate }: { item: PlanItem; planId: strin
       <View style={styles.itemContent}>
         <Text style={styles.itemTitle}>{title}</Text>
         <Text style={styles.itemSubtitle}>{subtitle}</Text>
+        <Text style={styles.itemPrice}>{price}</Text>
       </View>
       <View style={styles.itemRight}>
-        <Text style={styles.itemPrice}>{price}</Text>
-        <TouchableOpacity onPress={() => { removeItem(planId, item.id); onUpdate(); }}>
+        <TouchableOpacity
+          style={[styles.reserveBtn, reserved && styles.reserveBtnDone]}
+          onPress={handleReserve}
+        >
+          <Text style={[styles.reserveBtnText, reserved && styles.reserveBtnTextDone]}>
+            {reserved ? '✅ Reservado' : 'Reservar'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => { removeItem(planId, item.id); onUpdate(); }} style={styles.removeBtn}>
           <Ionicons name="close-circle-outline" size={18} color="#94a3b8" />
         </TouchableOpacity>
       </View>
@@ -154,15 +185,21 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 13, fontWeight: "700", color: "#475569", textTransform: "uppercase", letterSpacing: 0.5, flex: 1 },
   sectionBadge: { backgroundColor: "#f1f5f9", paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 },
   sectionBadgeText: { fontSize: 11, fontWeight: "700", color: "#64748b" },
-  itemRow: { flexDirection: "row", alignItems: "center", paddingVertical: 8, paddingHorizontal: 4, borderRadius: 10, marginBottom: 4 },
-  itemRowPreferred: { backgroundColor: "#eff6ff" },
+  itemRow: { flexDirection: "row", alignItems: "center", paddingVertical: 10, paddingHorizontal: 8, borderRadius: 12, marginBottom: 6, borderWidth: 1, borderColor: '#f1f5f9', backgroundColor: '#ffffff' },
+  itemRowPreferred: { backgroundColor: "#eff6ff", borderColor: '#bfdbfe' },
+  itemRowReserved: { backgroundColor: "#f0fdf4", borderColor: '#86efac' },
   starBtn: { marginRight: 8 },
   starIcon: { fontSize: 20, color: "#f59e0b" },
   itemContent: { flex: 1 },
-  itemTitle: { fontSize: 14, fontWeight: "600", color: "#0f172a" },
-  itemSubtitle: { fontSize: 12, color: "#64748b", marginTop: 2 },
-  itemRight: { alignItems: "flex-end", gap: 4 },
-  itemPrice: { fontSize: 13, fontWeight: "700", color: "#2563eb" },
+  itemTitle: { fontSize: 13, fontWeight: "600", color: "#0f172a" },
+  itemSubtitle: { fontSize: 11, color: "#64748b", marginTop: 1 },
+  itemPrice: { fontSize: 12, fontWeight: "700", color: "#2563eb", marginTop: 3 },
+  itemRight: { alignItems: 'flex-end', marginLeft: 8 },
+  removeBtn: { marginTop: 6 },
+  reserveBtn: { backgroundColor: '#2563eb', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  reserveBtnDone: { backgroundColor: '#dcfce7' },
+  reserveBtnText: { fontSize: 12, fontWeight: '700', color: '#ffffff' },
+  reserveBtnTextDone: { color: '#16a34a' },
   emptyPlan: { fontSize: 13, color: "#94a3b8", textAlign: "center", paddingVertical: 16 },
   empty: { alignItems: "center", paddingTop: 80 },
   emptyIcon: { fontSize: 56, marginBottom: 16 },
