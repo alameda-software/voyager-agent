@@ -12,20 +12,23 @@ from app import models  # noqa: F401 - ensure all models are registered
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Run Alembic migrations on startup (creates + migrates all tables)
+    # Create tables + add any missing columns (safe ALTER TABLE ADD COLUMN IF NOT EXISTS)
     try:
-        import subprocess, sys
-        result = subprocess.run(
-            [sys.executable, "-m", "alembic", "upgrade", "head"],
-            capture_output=True, text=True, cwd="/app"
-        )
-        print("Alembic stdout:", result.stdout.strip())
-        if result.returncode != 0:
-            print("Alembic stderr:", result.stderr.strip())
-        else:
-            print("DB migrations OK")
+        from sqlalchemy import text
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+            # Add columns introduced in migration 0003 (safe, idempotent)
+            for sql in [
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) NOT NULL DEFAULT 'user'",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS partner_name VARCHAR(255)",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS wedding_date VARCHAR(50)",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(255)",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS budget INTEGER",
+            ]:
+                await conn.execute(text(sql))
+        print("DB schema OK")
     except Exception as e:
-        print("DB migration error:", e)
+        print("DB init error:", e)
 
     # Seed wedding vendors if table is empty
     try:
