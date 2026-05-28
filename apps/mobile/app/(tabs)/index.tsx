@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,6 +7,7 @@ import { createConversation } from "../../src/api/client";
 import { MobileScreen } from "../../src/components/MobileScreen";
 import { colors } from "../../src/theme";
 import type { ConciergeDomain } from "../../src/types";
+import { getUser, clearAuth, type UserProfile } from "../../src/store/auth";
 
 const TEST_USER_ID = 1;
 
@@ -31,6 +32,17 @@ const DOMAIN_OPTIONS = [
 
 export default function HomeTab() {
   const [activeDomain, setActiveDomain] = useState<ConciergeDomain | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    setUser(getUser());
+  }, []);
+
+  const handleLogout = () => {
+    clearAuth();
+    setUser(null);
+    router.replace('/login');
+  };
 
   const handleStart = async (domain: ConciergeDomain) => {
     try {
@@ -58,8 +70,24 @@ export default function HomeTab() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.logo}>✦ Concierge</Text>
-          <Text style={styles.title}>What are you planning?</Text>
+          <View style={styles.headerTop}>
+            <Text style={styles.logo}>✦ LiveGate</Text>
+            {user ? (
+              <View style={styles.userPill}>
+                <Text style={styles.userPillText}>{user.display_name || user.email.split('@')[0]}</Text>
+                <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+                  <Ionicons name="log-out-outline" size={15} color="#64748b" />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity onPress={() => router.push('/login')} style={styles.loginBtn}>
+                <Text style={styles.loginBtnText}>Entrar</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <Text style={styles.title}>
+            {user ? `Hola, ${user.display_name || user.email.split('@')[0]} 👋` : 'What are you planning?'}
+          </Text>
           <Text style={styles.subtitle}>Your AI assistant will guide you step by step.</Text>
         </View>
 
@@ -145,4 +173,10 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 16, fontWeight: "700", color: "#0f172a", marginBottom: 2 },
   cardSubtitle: { fontSize: 13, color: "#64748b", lineHeight: 18 },
   hint: { marginTop: 28, fontSize: 12, color: "#94a3b8", textAlign: "center" },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  userPill: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5 },
+  userPillText: { fontSize: 13, fontWeight: '600', color: '#0f172a', marginRight: 6 },
+  logoutBtn: { padding: 2 },
+  loginBtn: { backgroundColor: '#2563eb', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6 },
+  loginBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
 });
