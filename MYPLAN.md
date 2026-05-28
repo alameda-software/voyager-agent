@@ -39,9 +39,19 @@
 - SEO para búsqueda orgánica de proveedores
 - Perfil público de cada vendor (URL compartible)
 
-### 🔐 Autenticación de Usuarios
+### 🔐 Autenticación y Roles
+
+**Tres roles:**
+
+| Rol | Quién es | Qué puede hacer |
+|---|---|---|
+| `superadmin` | El equipo LiveGate | Todo — gestionar usuarios, vendors, datos, configuración global |
+| `vendor` | Proveedor de boda | Editar su perfil, subir fotos, ver consultas/mensajes de parejas |
+| `user` | Pareja (cliente) | Chat AI, plan de boda, calendario, contactar vendors |
+
 - Login real para parejas (email + contraseña / Google OAuth)
 - Login separado para vendors
+- Panel de superadmin para gestión de la plataforma
 - Perfil de la pareja: nombre, fecha de boda, ciudad, presupuesto
 
 ### 📱 Mejoras de UX
