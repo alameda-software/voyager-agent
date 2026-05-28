@@ -3,6 +3,14 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert }
 import { Ionicons } from "@expo/vector-icons";
 import { getPlans, setPreferred, removeItem, getPlanSummary, type TripPlan, type PlanItem } from "../../src/store/plan";
 
+function clearAllPlans() {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('trip_plans');
+    }
+  } catch {}
+}
+
 function SectionHeader({ icon, title, count }: { icon: string; title: string; count: number }) {
   return (
     <View style={styles.sectionHeader}>
@@ -147,10 +155,30 @@ export default function PlanScreen() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleClearAll = () => {
+    Alert.alert(
+      'Limpiar plan',
+      '¿Eliminar todos los elementos del plan?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: '🗑️ Limpiar todo', style: 'destructive', onPress: () => { clearAllPlans(); refresh(); } },
+      ]
+    );
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.header}>Mi Plan</Text>
-      <Text style={styles.headerSub}>Tus opciones seleccionadas. ★ marca tu preferida.</Text>
+      <View style={styles.headerRow}>
+        <View>
+          <Text style={styles.header}>Mi Plan</Text>
+          <Text style={styles.headerSub}>★ marca tu preferida · Reservar para confirmar</Text>
+        </View>
+        {plans.length > 0 && (
+          <TouchableOpacity onPress={handleClearAll} style={styles.clearBtn}>
+            <Ionicons name="trash-outline" size={18} color="#ef4444" />
+          </TouchableOpacity>
+        )}
+      </View>
 
       {plans.length === 0 ? (
         <View style={styles.empty}>
@@ -168,8 +196,10 @@ export default function PlanScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
   content: { padding: 20, paddingTop: 60, paddingBottom: 40 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 },
   header: { fontSize: 28, fontWeight: "800", color: "#0f172a", marginBottom: 4 },
-  headerSub: { fontSize: 14, color: "#64748b", marginBottom: 24 },
+  headerSub: { fontSize: 13, color: "#64748b" },
+  clearBtn: { padding: 8, backgroundColor: '#fff1f2', borderRadius: 10, borderWidth: 1, borderColor: '#fecaca' },
   planCard: {
     backgroundColor: "#ffffff", borderRadius: 20, padding: 16,
     borderWidth: 1, borderColor: "#e2e8f0", marginBottom: 20,
