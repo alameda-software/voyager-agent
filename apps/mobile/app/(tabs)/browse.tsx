@@ -47,11 +47,14 @@ interface Vendor {
 function VendorRow({ vendor }: { vendor: Vendor }) {
   return (
     <TouchableOpacity style={styles.vendorRow} activeOpacity={0.7}>
-      {vendor.image_url && (
+      {vendor.image_url ? (
         <Image
           source={{ uri: vendor.image_url }}
           style={styles.vendorImage}
+          resizeMode="cover"
         />
+      ) : (
+        <View style={styles.vendorImage} />
       )}
       <View style={styles.vendorMain}>
         <Text style={styles.vendorName}>{vendor.name}</Text>

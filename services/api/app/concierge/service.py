@@ -143,6 +143,12 @@ class ConciergeService:
         messages = await self._get_messages(conversation_id)
         return [self._message_read(item) for item in messages]
 
+    async def delete_conversation(self, conversation_id: int) -> dict:
+        conversation = await self._get_conversation(conversation_id)
+        self.db.delete(conversation)
+        await self.db.commit()
+        return {"success": True}
+
     async def _ensure_user_exists(self, user_id: int) -> User:
         result = await self.db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()

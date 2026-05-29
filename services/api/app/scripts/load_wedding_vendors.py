@@ -32,10 +32,11 @@ async def load_vendors():
         await session.execute(text("DELETE FROM wedding_vendors"))
         print("🗑️  Cleared existing vendors")
 
-        # Insert vendors
+        valid_cols = {c.key for c in Vendor.__table__.columns}
         vendors = []
         for vendor_data in vendors_data:
-            vendor = Vendor(**vendor_data)
+            filtered = {k: v for k, v in vendor_data.items() if k in valid_cols}
+            vendor = Vendor(**filtered)
             vendors.append(vendor)
 
         session.add_all(vendors)

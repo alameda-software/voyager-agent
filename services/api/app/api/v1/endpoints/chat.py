@@ -63,3 +63,12 @@ async def get_history(
 ):
     service = ConciergeService(db)
     return await service.get_history(conversation_id)
+
+
+@router.delete("/conversations/{conversation_id}")
+async def delete_conversation(
+    conversation_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    service = ConciergeService(db)
+    return await service.delete_conversation(conversation_id)

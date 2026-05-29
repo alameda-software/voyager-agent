@@ -68,6 +68,9 @@ export const sendMessage = (conversationId: number, content: string) =>
 export const getHistory = (conversationId: number) =>
   api.get(`/api/v1/chat/history?conversation_id=${conversationId}`);
 
+export const deleteConversation = (conversationId: number) =>
+  api.delete(`/api/v1/chat/conversations/${conversationId}`);
+
 // Search
 export const searchFlights = (params: Record<string, string>) =>
   api.post("/api/v1/search/flights", params);

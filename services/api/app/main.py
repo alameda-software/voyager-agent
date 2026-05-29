@@ -66,21 +66,26 @@ async def lifespan(app: FastAPI):
         import json
         from pathlib import Path
 
-        async with AsyncSessionLocal() as session:
-            result = await session.execute(select(func.count()).select_from(Vendor))
-            count = result.scalar()
-            if count == 0:
-                vendors_path = Path(__file__).parent / "domains" / "wedding" / "data" / "vendors.json"
-                if vendors_path.exists():
-                    data = json.loads(vendors_path.read_text(encoding="utf-8"))
-                    vendors_data = data.get("vendors", [])
+        vendors_path = Path(__file__).parent / "domains" / "wedding" / "data" / "vendors.json"
+        if vendors_path.exists():
+            data = json.loads(vendors_path.read_text(encoding="utf-8"))
+            vendors_data = data.get("vendors", [])
+            valid_cols = {c.key for c in Vendor.__table__.columns}
+
+            async with AsyncSessionLocal() as session:
+                result = await session.execute(select(func.count()).select_from(Vendor))
+                count = result.scalar()
+
+                if count != len(vendors_data):
+                    await session.execute(text("DELETE FROM wedding_vendors"))
                     for vd in vendors_data:
-                        vd.pop("id", None)  # Let DB assign IDs
-                        session.add(Vendor(**vd))
+                        filtered = {k: v for k, v in vd.items() if k in valid_cols}
+                        filtered.pop("id", None)
+                        session.add(Vendor(**filtered))
                     await session.commit()
-                    print(f"Seeded {len(vendors_data)} wedding vendors")
-            else:
-                print(f"Wedding vendors already seeded ({count} rows)")
+                    print(f"Re-seeded {len(vendors_data)} wedding vendors (was {count})")
+                else:
+                    print(f"Wedding vendors up to date ({count} rows)")
     except Exception as e:
         print("Wedding vendor seed error:", e)
 
