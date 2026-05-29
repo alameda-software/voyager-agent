@@ -7,35 +7,28 @@ import type {
   SendMessageResponse,
 } from "../types";
 
-// Auto-detect API URL based on environment
-let API_URL = process.env.EXPO_PUBLIC_API_URL?.trim() || "";
+// Always auto-detect at runtime for web builds
+let API_URL: string;
 
-// If not explicitly set, detect from runtime environment
-if (!API_URL || API_URL === "undefined" || API_URL === "localhost") {
-  if (typeof window !== "undefined") {
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol;
+if (typeof window !== "undefined") {
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
 
-    // For development
-    if (hostname === "localhost" || hostname === "127.0.0.1") {
-      API_URL = "http://localhost:8000";
-    }
-    // For production at leafgate.es domain
-    else if (hostname.includes("leafgate.es")) {
-      API_URL = `${protocol}//api.leafgate.es`;
-    }
-    // Default: same domain, port 8000
-    else {
-      API_URL = `${protocol}//${hostname}:8000`;
-    }
-  } else {
+  // For development
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
     API_URL = "http://localhost:8000";
   }
-}
-
-// Final fallback
-if (!API_URL || API_URL === "undefined") {
-  API_URL = "http://localhost:8000";
+  // For production at leafgate.es domain
+  else if (hostname.includes("leafgate.es")) {
+    API_URL = `${protocol}//api.leafgate.es`;
+  }
+  // Default: same domain, port 8000
+  else {
+    API_URL = `${protocol}//${hostname}:8000`;
+  }
+} else {
+  // Fallback for SSR or non-browser environments
+  API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
 }
 
 export const api = axios.create({
