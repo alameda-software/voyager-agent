@@ -7,35 +7,42 @@ import type {
   SendMessageResponse,
 } from "../types";
 
-// Always auto-detect at runtime for web builds
-let API_URL: string;
+// Lazy function to get API URL at request time
+function getApiUrl(): string {
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
 
-if (typeof window !== "undefined") {
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-
-  // For development
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
-    API_URL = "http://localhost:8000";
+    // For development
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://localhost:8000";
+    }
+    // For production at leafgate.es domain
+    else if (hostname.includes("leafgate.es")) {
+      return `${protocol}//api.leafgate.es`;
+    }
+    // Default: same domain, port 8000
+    else {
+      return `${protocol}//${hostname}:8000`;
+    }
   }
-  // For production at leafgate.es domain
-  else if (hostname.includes("leafgate.es")) {
-    API_URL = `${protocol}//api.leafgate.es`;
-  }
-  // Default: same domain, port 8000
-  else {
-    API_URL = `${protocol}//${hostname}:8000`;
-  }
-} else {
-  // Fallback for SSR or non-browser environments
-  API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+  // Fallback for non-browser
+  return "http://localhost:8000";
 }
 
+// Create axios instance with dynamic baseURL
 export const api = axios.create({
-  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+// Intercept requests to set baseURL dynamically
+api.interceptors.request.use((config) => {
+  if (!config.baseURL) {
+    config.baseURL = getApiUrl();
+  }
+  return config;
 });
 
 // Auth
